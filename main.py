@@ -1,4 +1,7 @@
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
+from Crypto import Random  #RSA 키 생성시 필요
+from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import os
 
 def get_tmp(in_filename):
@@ -8,6 +11,16 @@ def get_tmp(in_filename):
     return tmp
 
 def enc(key, in_filename, out_filename=None):
+
+    #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
+    random_generator = Random.new().read
+    rsa_key = RSA.generate(1024, random_generator)
+    cipher = PKCS1_OAEP.new(rsa_key)
+    ciphertext = cipher.encrypt(key)
+
+    print("\nRSA를 통한 key 암호화문 : \n",ciphertext,"\n")
+    #/////////////////////////////////////////////////
+
 
     print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
@@ -81,7 +94,7 @@ def dec(x, key, in_filename, out_filename):
             #아스키코드로 진행된 경우
 
             print("3. after unpadding d_data")
-            print(d_data.decode(encoding='utf-8'))
+            #print(d_data.decode(encoding='utf-8'))
 
             outfile.write(d_data)
 
@@ -100,7 +113,7 @@ def text(key, in_filename):
     x = get_tmp(in_filename)
     enc(key, in_filename, out_filename='target_enc.antdd')
     print("")
-    dec(x, key, 'target_enc.antdd', out_filename='target_dec.txt')
+    dec(x, key, 'target_enc.antdd', out_filename='컴보_dec.docx')
 
 def image(key, in_filename):
 
@@ -114,7 +127,7 @@ def main():
     key = b'Sixteen byte key'
 
     print("")
-    text(key, 'target.txt')
+    text(key, '컴보.docx')
 
     print("")
     #image(key, 'family.jpg')
