@@ -1,15 +1,15 @@
 from Crypto.Cipher import AES
 import os
 
-
 def get_tmp(in_filename):
     tmp = b''
     with open(in_filename, 'rb') as infile:
         tmp = infile.read()
     return tmp
 
-
 def enc(key, in_filename, out_filename=None):
+
+    print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
     iv = b'Sixteen byte iv3'
 
@@ -24,89 +24,99 @@ def enc(key, in_filename, out_filename=None):
         # 일단 읽어온 것을 출력해보자
         data = infile.read()
 
-        print("")
-        print("Initial Message was: ", data)
+        print("1. Plain Message was: ")
+        print(data)
 
-        # 패딩에 대한 부분 3
+        # 패딩에 대한 부분
         length = 16 - (len(data) % 16)
         data += bytes([length]) * length
 
-        print("")
-        print("After Padding Message was: ", data)
-        # 결과로 b'file to encrypt\r\nHello Everyone'가 나온다
+        print("2. After Padding Message was: ")
+        print(data)
 
         with open(out_filename, 'wb') as outfile:
             encryptor = AES.new(key, mode, iv)
             e_data = encryptor.encrypt(data)
             # 그럼 e_data도 마찬가지로 b''형식이다.
-            print("")
-            print("e_data Message was: ", e_data)
+
+            print("3. e_data Message was: ")
+            print(e_data)
 
             outfile.write(e_data)
 
-    # writh가 완료된 상태에서 out_file을 읽어보자
+    # write가 완료된 상태에서 out_file을 읽어보자
     with open(out_filename, 'rb') as result:
-        print("")
-        print(out_filename, "내용은", result.read())
+        print("4. encryption result is: ", out_filename)
+        print(result.read())
+
+    print("---END ENCRYPTION : AES")
 
 
 def dec(x, key, in_filename, out_filename):
+    print("---START DECRYPTION : AES")
+
     mode = AES.MODE_CBC
     iv = b'Sixteen byte iv3'
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
-        print("")
-        print("Cipher was: ", e_data)
+
+        print("1. Cipher was: ")
+        print(e_data)
 
         with open(out_filename, 'wb') as outfile:
             decryptor = AES.new(key, mode, iv)
             d_data = decryptor.decrypt(e_data)
 
-            print("")
-            print("어쩌구 전 d_data", d_data)
+            print("2. before unpadding d_data")
+            print(d_data)
 
             # 패딩 처리한 부분을 다시 지워준다
             # d_data = e_data[:-x[-1]] 에서 x[-1]의 값은 100
             # 바이트 크기로 인식하기 때문에 d->ascii->100
-            test = str(x)[-2]
             d_data = d_data[:d_data.rfind(x[-1]) + 1]
 
-            print("")
             #####print("어쩌구 후 d_data: ", d_data.decode('ascii'))
             ##target의 내용이 한글인 경우 에러발생
+            #아스키코드로 진행된 경우
+
+            print("3. after unpadding d_data")
             print(d_data.decode(encoding='utf-8'))
 
             outfile.write(d_data)
 
-    # writh가 완료된 상태에서 out_file을 읽어보자
+    # write가 완료된 상태에서 out_file을 읽어보자
+    # 읽을 때 rb가 아니라 r로 읽으면
+    # UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 7: illegal multibyte sequence
     with open(out_filename, 'rb') as result:
-        print("")
-        print(out_filename, "내용은", result.read())
+        print("4. decryption result is: ", out_filename)
+        print(result.read())
 
+    print("---END DECRYPTION : AES")
+
+def text(key, in_filename):
+
+    print("TEXT FILE AES TEST")
+    x = get_tmp(in_filename)
+    enc(key, in_filename, out_filename='target_enc.antdd')
+    print("")
+    dec(x, key, 'target_enc.antdd', out_filename='target_dec.txt')
+
+def image(key, in_filename):
+
+    print("IMAGE FILE AES TEST")
+    x = get_tmp(in_filename)
+    enc(key, in_filename, out_filename='family_enc.antdd')
+    print("")
+    dec(x, key, 'family_enc.antdd', out_filename='family_dec.jpg')
 
 def main():
     key = b'Sixteen byte key'
 
-    in_filename = 'target.txt'
+    print("")
+    text(key, 'target.txt')
 
-    x = get_tmp(in_filename)
-
-    enc(key, in_filename, out_filename='target_enc.antdd')
-
-    print("---")
-    dec(x, key, 'target_enc.antdd', out_filename='target_dec.txt')
-
-    # data = b'testest'
-
-    # e_cipher = AES.new(key, AES.MODE_CBC)
-    # e_data = e_cipher.encrypt(data)
-
-    # d_cipher = AES.new(key, AES.MODE_CBC, e_cipher.nonce)
-    # d_data = d_cipher.decrypt(e_data)
-
-    # print("Encryption was: ", e_data)
-    # print("Original Message was: ", d_data)
-
+    print("")
+    #image(key, 'family.jpg')
 
 main()
