@@ -14,7 +14,7 @@ def enc(key, in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
     random_generator = Random.new().read
-    rsa_key = RSA.generate(1024, random_generator)
+    rsa_key = RSA.generate(1024, random_generator)  //공개키
     cipher = PKCS1_OAEP.new(rsa_key)
     ciphertext = cipher.encrypt(key)
 
