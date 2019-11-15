@@ -2,7 +2,17 @@ from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random  #RSA 키 생성시 필요
 from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
+import glob
 import os
+
+def list_files(path, ext):
+    filelist=[]
+    for name in os.listdir(path):
+        if os.path.isfile(os.path.join(path,name)):
+            if name.endswith(ext):
+                filelist.append(name)
+    print("filelist: ", filelist)
+    return filelist
 
 def get_tmp(in_filename):
     tmp = b''
@@ -66,6 +76,11 @@ def enc(key, in_filename, out_filename=None):
 
 
 def dec(x, key, in_filename, out_filename):
+
+    if not out_filename:
+        out_filename = os.path.splitext(in_filename)[0]
+    print(out_filename)
+
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -111,26 +126,35 @@ def text(key, in_filename):
 
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='target_enc.antdd')
+    enc(key, in_filename, out_filename=None)
     print("")
-    dec(x, key, 'target_enc.antdd', out_filename='컴보_dec.docx')
+    dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 def image(key, in_filename):
 
     print("IMAGE FILE AES TEST")
     x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='family_enc.antdd')
+    enc(key, in_filename, out_filename=None)
     print("")
-    dec(x, key, 'family_enc.antdd', out_filename='family_dec.jpg')
+    dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 def main():
     key = b'Sixteen byte key'
 
-    print("")
-    #text(key, '컴보.docx')
+    enc_targetlist = list_files(os.getcwd(), '.txt')
+    for enc_target in enc_targetlist:
+        enc(key, enc_target, out_filename=None)
 
     print("")
+    dec_targetlist = list_files(os.getcwd(), '.antdd')
+    for dec_target in dec_targetlist:
+        x=get_tmp(os.path.splitext(dec_target)[0])
+        dec(x, key, dec_target, out_filename=None) #x 없어야함
+
+    #해당 파일들은 확인 끝남
+    #text(key, 'target.txt')
+    #text(key, '컴보.docx')
     #image(key, 'family.jpg')
-    image(key, '짱구얌.png')
+    #image(key, '짱구얌.png')
 
 main()
