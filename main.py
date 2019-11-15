@@ -5,13 +5,19 @@ from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import glob
 import os
 
-def list_files(path, ext):
+def list_files(path, ext=None):
     filelist=[]
+    print("os.listdir(): \n", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path,name)):
-            if name.endswith(ext):
+            if name.endswith('.py'):
+                continue
+            if (ext == None):
                 filelist.append(name)
-    print("filelist: ", filelist)
+            elif name.endswith(ext):
+                filelist.append(name)
+
+    print("filelist: \n", filelist)
     return filelist
 
 def get_tmp(in_filename):
@@ -123,7 +129,6 @@ def dec(x, key, in_filename, out_filename):
     print("---END DECRYPTION : AES")
 
 def text(key, in_filename):
-
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
     enc(key, in_filename, out_filename=None)
@@ -131,7 +136,6 @@ def text(key, in_filename):
     dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 def image(key, in_filename):
-
     print("IMAGE FILE AES TEST")
     x = get_tmp(in_filename)
     enc(key, in_filename, out_filename=None)
@@ -141,15 +145,29 @@ def image(key, in_filename):
 def main():
     key = b'Sixteen byte key'
 
-    enc_targetlist = list_files(os.getcwd(), '.txt')
-    for enc_target in enc_targetlist:
-        enc(key, enc_target, out_filename=None)
+    while True:
+        menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
+        if (menu == 1):
+            enc_targetlist = list_files(os.getcwd())
+            print("enc_targetlist: \n", enc_targetlist)
+            for enc_target in enc_targetlist:
+                enc(key, enc_target, out_filename=None)
+        elif (menu == 2):
+            dec_targetlist = list_files(os.getcwd(), '.antdd')
+            print("dec_targetlist: \n", dec_targetlist)
 
-    print("")
-    dec_targetlist = list_files(os.getcwd(), '.antdd')
-    for dec_target in dec_targetlist:
-        x=get_tmp(os.path.splitext(dec_target)[0])
-        dec(x, key, dec_target, out_filename=None) #x 없어야함
+            for dec_target in dec_targetlist:
+                #print(os.path.splitext(dec_target)[0])
+                #x = get_tmp(os.path.splitext(dec_target)[0])
+
+                print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
+                x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
+
+                dec(x, key, dec_target, out_filename=None)  # x 없어야함
+        elif (menu == 3):
+            break
+        else:
+            continue
 
     #해당 파일들은 확인 끝남
     #text(key, 'target.txt')
