@@ -26,7 +26,7 @@ def get_tmp(in_filename):
         tmp = infile.read()
     return tmp
 
-def enc(key, in_filename, out_filename=None):
+def enc_1(key, in_filename, out_filename=None):
 
     print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
@@ -70,7 +70,7 @@ def enc(key, in_filename, out_filename=None):
 
     print("---END ENCRYPTION : AES")
 
-def dec(x, key, in_filename, out_filename):
+def dec_1(x, key, in_filename, out_filename):
 
     if not out_filename:
         out_filename = os.path.splitext(in_filename)[0]
@@ -119,7 +119,7 @@ def dec(x, key, in_filename, out_filename):
 
 
 
-def enc_jw(key, cipher, in_filename, out_filename=None):
+def enc(key, cipher, in_filename, out_filename=None):
 
     # RSA 로 AES 키 암호화
     ciphertext = cipher.encrypt(key)  # 128비트
@@ -144,7 +144,7 @@ def enc_jw(key, cipher, in_filename, out_filename=None):
 
         print("1. Plain Message was: ")
         print(data, '\n', len(data))
-        sizeOfData = len(str(len(data)))
+        sizeOfData = len(data)
 
         # 패딩에 대한 부분
         length = 16 - (len(data) % 16)
@@ -159,7 +159,8 @@ def enc_jw(key, cipher, in_filename, out_filename=None):
         #이어쓰기 모드
         with open(out_filename, 'ab') as outfile:
             #RSA : 길이 64825 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
-            outfile.write(b'0'*(64825-sizeOfData)+str(sizeOfData).encode())
+            outfile.write(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode())
+            print(b'0'*(64832-sizeOfData)+str(sizeOfData).encode())
             #RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
@@ -177,23 +178,25 @@ def enc_jw(key, cipher, in_filename, out_filename=None):
         print(result.read())
 
     print("---END ENCRYPTION : AES")
-
-
-def dec_jw(x, key,  cipher, in_filename, out_filename):
+def dec(x, cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
     iv = b'Sixteen byte iv3'
 
+    if not out_filename:
+        out_filename = os.path.splitext(in_filename)[0]
+    print(out_filename)
+
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
 
         #RSA : 파일의 크기와 암호화된 AES 키 추출
-        sizeOfData = e_data[:64824]
-        aes_key_enc = e_data[64824:64952]  # 암호화된 aes 키
-
+        sizeOfData = e_data[:64832]
+        aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
+        print(len(aes_key_enc), aes_key_enc)
         #RSA : 암호화된 진짜 원본 데이터 추출
-        e_data = e_data[64952:]
+        e_data = e_data[64960:]
 
         #RSA : 추출한 AES 키 복호환
         aes_key_dec = cipher.decrypt(aes_key_enc)
@@ -243,9 +246,9 @@ def test_jw(in_filename):
 
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
-    enc_jw(key, cipher, in_filename, out_filename='target_enc.antdd')
+    enc(key, cipher, in_filename, out_filename='target_enc.antdd')
     print("")
-    dec_jw(x, key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
+    dec(x, key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
 
 
 ##def text(key, in_filename):
@@ -267,8 +270,13 @@ def test_jw(in_filename):
 if __name__ == "__main__":
 
     key = b'Sixteen byte key' #키 랜덤으로 생성해야한다.
-    test_jw("test.txt")
-    while False:
+
+    #RSA : 키, 싸이퍼 생성
+    random_generator = Random.new().read
+    rsa_key = RSA.generate(1024, random_generator)  # 키 정보 객체
+    cipher = PKCS1_OAEP.new(rsa_key)
+
+    while True:
         menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
         if (menu == 1):
             enc_targetlist = list_files(os.getcwd())    #os.getcwd는 해당 폴더에서 가져옴.
@@ -277,7 +285,7 @@ if __name__ == "__main__":
             for enc_target in enc_targetlist:
                 if enc_target.split('.')[-1]=='antdd':
                     continue
-                enc(key, enc_target, out_filename=None)
+                enc(key, cipher,enc_target, out_filename=None)
         elif (menu == 2):
             dec_targetlist = list_files(os.getcwd(), '.antdd')
             print("dec_targetlist: \n", dec_targetlist)
@@ -289,7 +297,7 @@ if __name__ == "__main__":
                 print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
                 x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
 
-                dec(x, key, dec_target, out_filename=None)  # x 없어야함
+                dec(x, cipher,dec_target, out_filename=None)  # x 없어야함
         elif (menu == 3):
             break
         else:
