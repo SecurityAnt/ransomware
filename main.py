@@ -14,7 +14,7 @@ def enc(key, in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
     random_generator = Random.new().read
-    rsa_key = RSA.generate(1024, random_generator)  //공개키
+    rsa_key = RSA.generate(1024, random_generator)  #공개키, 개인키
     cipher = PKCS1_OAEP.new(rsa_key)
     ciphertext = cipher.encrypt(key)
 
@@ -24,7 +24,7 @@ def enc(key, in_filename, out_filename=None):
 
     print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3'
+    iv = b'Sixteen byte iv3'    #키 랜덤으로 받기
 
     # enc의 결과로 나오는 파일 이름을 정한다
     if not out_filename:
@@ -121,16 +121,16 @@ def image(key, in_filename):
     x = get_tmp(in_filename)
     enc(key, in_filename, out_filename='family_enc.antdd')
     print("")
-    dec(x, key, 'family_enc.antdd', out_filename='family_dec.jpg')
+    dec(x, key, 'family_enc.antdd', out_filename='tkintertest_dec.exe')
 
 def main():
     key = b'Sixteen byte key'
 
     print("")
-    #text(key, '컴보.docx')
+    text(key, 'target.txt')
 
     print("")
     #image(key, 'family.jpg')
-    image(key, '짱구얌.png')
+    #image(key, 'tkintertest.exe')
 
 main()
