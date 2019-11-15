@@ -263,6 +263,8 @@ if __name__ == "__main__":
             #나중에 전체 트래킹 하는 법 알아야함
             print("enc_targetlist: \n", enc_targetlist)
             for enc_target in enc_targetlist:
+                if enc_target.split('.')[-1]=='antdd':
+                    continue
                 enc(key, enc_target, out_filename=None)
         elif (menu == 2):
             dec_targetlist = list_files(os.getcwd(), '.antdd')
