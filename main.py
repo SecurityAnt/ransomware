@@ -120,7 +120,8 @@ def dec(x, key, in_filename, out_filename):
 
 
 def enc_jw(key, cipher, in_filename, out_filename=None):
-    # RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
+
+    # RSA 로 AES 키 암호화
     ciphertext = cipher.encrypt(key)  # 128비트
     print(cipher.decrypt(ciphertext))
     print("\nRSA를 통한 key 암호화문 : \n", ciphertext, "\n")
@@ -154,15 +155,19 @@ def enc_jw(key, cipher, in_filename, out_filename=None):
 
         with open(out_filename, 'wb') as outfile:
             pass
+
+        #이어쓰기 모드
         with open(out_filename, 'ab') as outfile:
-            outfile.write(b'0' * (64832 - sizeOfData) + bytes(sizeOfData))
+            #RSA : 길이 64825 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
+            outfile.write(b'0'*(64825-sizeOfData)+str(sizeOfData).encode())
+            #RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
             e_data = encryptor.encrypt(data)
             # 그럼 e_data도 마찬가지로 b''형식이다.
 
             print("3. e_data Message was: ")
-            print(bytes(sizeOfData) + b'0' * (64824 - sizeOfData), ciphertext, e_data)
+            print(e_data)
 
             outfile.write(e_data)
 
@@ -174,7 +179,7 @@ def enc_jw(key, cipher, in_filename, out_filename=None):
     print("---END ENCRYPTION : AES")
 
 
-def dec_jw(x, key, rsa_key, cipher, in_filename, out_filename):
+def dec_jw(x, key,  cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -182,17 +187,22 @@ def dec_jw(x, key, rsa_key, cipher, in_filename, out_filename):
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
-        sizeOfData = e_data[:64825]
-        aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
-        print(aes_key_enc)
 
+        #RSA : 파일의 크기와 암호화된 AES 키 추출
+        sizeOfData = e_data[:64824]
+        aes_key_enc = e_data[64824:64952]  # 암호화된 aes 키
+
+        #RSA : 암호화된 진짜 원본 데이터 추출
+        e_data = e_data[64952:]
+
+        #RSA : 추출한 AES 키 복호환
         aes_key_dec = cipher.decrypt(aes_key_enc)
         print('AES key was :', aes_key_dec)
         print("1. Cipher was: ")
         print(e_data)
 
         with open(out_filename, 'wb') as outfile:
-            decryptor = AES.new(key, mode, iv)
+            decryptor = AES.new(aes_key_dec, mode, iv)
 
             d_data = decryptor.decrypt(e_data)
 
@@ -223,7 +233,7 @@ def dec_jw(x, key, rsa_key, cipher, in_filename, out_filename):
     print("---END DECRYPTION : AES")
 
 
-def test_jw(key, rsa_key, cipher, in_filename):
+def test_jw(in_filename):
     key = b'Sixteen byte key'
 
     random_generator = Random.new().read
@@ -233,9 +243,9 @@ def test_jw(key, rsa_key, cipher, in_filename):
 
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
-    enc_jw(key, rsa_key, cipher, in_filename, out_filename='target_enc.antdd')
+    enc_jw(key, cipher, in_filename, out_filename='target_enc.antdd')
     print("")
-    dec_jw(x, key, rsa_key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
+    dec_jw(x, key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
 
 
 ##def text(key, in_filename):
@@ -255,8 +265,10 @@ def test_jw(key, rsa_key, cipher, in_filename):
 ##dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 if __name__ == "__main__":
+
     key = b'Sixteen byte key' #키 랜덤으로 생성해야한다.
-    while True:
+    test_jw("test.txt")
+    while False:
         menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
         if (menu == 1):
             enc_targetlist = list_files(os.getcwd())    #os.getcwd는 해당 폴더에서 가져옴.
