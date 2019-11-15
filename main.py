@@ -158,9 +158,9 @@ def enc(key, cipher, in_filename, out_filename=None):
 
         #이어쓰기 모드
         with open(out_filename, 'ab') as outfile:
-            #RSA : 길이 64825 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
+            #RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
             outfile.write(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode())
-            print(b'0'*(64832-sizeOfData)+str(sizeOfData).encode())
+            print('\ndata size : ',len(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode()))
             #RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
@@ -178,7 +178,7 @@ def enc(key, cipher, in_filename, out_filename=None):
         print(result.read())
 
     print("---END ENCRYPTION : AES")
-def dec(x, cipher, in_filename, out_filename):
+def dec( cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -190,9 +190,9 @@ def dec(x, cipher, in_filename, out_filename):
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
-
+        print('size : ',e_data[:64832])
         #RSA : 파일의 크기와 암호화된 AES 키 추출
-        sizeOfData = e_data[:64832]
+        sizeOfData = int(e_data[:64832].lstrip(b'0').decode())
         aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
         print(len(aes_key_enc), aes_key_enc)
         #RSA : 암호화된 진짜 원본 데이터 추출
@@ -212,10 +212,12 @@ def dec(x, cipher, in_filename, out_filename):
             print("2. before unpadding d_data")
             print(d_data)
 
+
+            d_data = d_data[:sizeOfData]
             # 패딩 처리한 부분을 다시 지워준다
             # d_data = e_data[:-x[-1]] 에서 x[-1]의 값은 100
             # 바이트 크기로 인식하기 때문에 d->ascii->100
-            d_data = d_data[:d_data.rfind(x[-1]) + 1]
+            #d_data = d_data[:d_data.rfind(x[-1]) + 1]
 
             #####print("어쩌구 후 d_data: ", d_data.decode('ascii'))
             ##target의 내용이 한글인 경우 에러발생
@@ -248,7 +250,7 @@ def test_jw(in_filename):
     x = get_tmp(in_filename)
     enc(key, cipher, in_filename, out_filename='target_enc.antdd')
     print("")
-    dec(x, key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
+    dec(key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
 
 
 ##def text(key, in_filename):
