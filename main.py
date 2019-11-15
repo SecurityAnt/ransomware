@@ -9,6 +9,7 @@ def get_tmp(in_filename):
     with open(in_filename, 'rb') as infile:
         tmp = infile.read()
     return tmp
+
 def enc_jw(key, rsa_key,cipher,in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
