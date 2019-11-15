@@ -28,7 +28,7 @@ def rsa_dec(msg):
     return decrypted
 
 if __name__ == '__main__':
-    msg = bytes("abcd", "utf8") #나중에 AES 키로 변경해야 함.
+    msg = bytes("abcd", "utf8") #나중에 AES 키로 변경해야 함. #암호화할 평문 : abcd
     ENCtext = rsa_enc(msg)
     DECtext = rsa_dec(ENCtext)
 
