@@ -2,14 +2,29 @@ from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random  #RSA 키 생성시 필요
 from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
+import glob
 import os
+
+def list_files(path, ext=None):
+    filelist=[]
+    print("os.listdir(): \n", os.listdir())
+    for name in os.listdir(path):
+        if os.path.isfile(os.path.join(path,name)):
+            if name.endswith('.py'):
+                continue
+            if (ext == None):
+                filelist.append(name)
+            elif name.endswith(ext):
+                filelist.append(name)
+
+    print("filelist: \n", filelist)
+    return filelist
 
 def get_tmp(in_filename):
     tmp = b''
     with open(in_filename, 'rb') as infile:
         tmp = infile.read()
     return tmp
-
 def enc_jw(key, rsa_key,cipher,in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
@@ -71,7 +86,7 @@ def enc(key, in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
     random_generator = Random.new().read
-    rsa_key = RSA.generate(1024, random_generator)  #공개키, 개인키
+    rsa_key = RSA.generate(1024, random_generator)
     cipher = PKCS1_OAEP.new(rsa_key)
     ciphertext = cipher.encrypt(key)
 
@@ -81,7 +96,7 @@ def enc(key, in_filename, out_filename=None):
 
     print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3'    #키 랜덤으로 받기
+    iv = b'Sixteen byte iv3'
 
     # enc의 결과로 나오는 파일 이름을 정한다
     if not out_filename:
@@ -121,8 +136,12 @@ def enc(key, in_filename, out_filename=None):
 
     print("---END ENCRYPTION : AES")
 
-
 def dec(x, key, in_filename, out_filename):
+
+    if not out_filename:
+        out_filename = os.path.splitext(in_filename)[0]
+    print(out_filename)
+
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -163,6 +182,9 @@ def dec(x, key, in_filename, out_filename):
         print(result.read())
 
     print("---END DECRYPTION : AES")
+
+
+
 def dec_jw(x, key, rsa_key,cipher,in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
@@ -211,6 +233,7 @@ def dec_jw(x, key, rsa_key,cipher,in_filename, out_filename):
         print(result.read())
 
     print("---END DECRYPTION : AES")
+
 def test_jw(key, rsa_key,cipher,in_filename):
     key = b'Sixteen byte key'
 
@@ -229,26 +252,49 @@ def text(key, in_filename):
 
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='target_enc.antdd')
+    enc(key, in_filename, out_filename=None)
     print("")
-    dec(x, key, 'target_enc.antdd', out_filename='컴보_dec.docx')
+    dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 def image(key, in_filename):
 
     print("IMAGE FILE AES TEST")
     x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='family_enc.antdd')
+    enc(key, in_filename, out_filename=None)
     print("")
-    dec(x, key, 'family_enc.antdd', out_filename='tkintertest_dec.exe')
+    dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
 def main():
     key = b'Sixteen byte key'
 
-    print("")
-    text(key, 'target.txt')
+    while True:
+        menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
+        if (menu == 1):
+            enc_targetlist = list_files(os.getcwd())
+            print("enc_targetlist: \n", enc_targetlist)
+            for enc_target in enc_targetlist:
+                enc(key, enc_target, out_filename=None)
+        elif (menu == 2):
+            dec_targetlist = list_files(os.getcwd(), '.antdd')
+            print("dec_targetlist: \n", dec_targetlist)
 
-    print("")
+            for dec_target in dec_targetlist:
+                #print(os.path.splitext(dec_target)[0])
+                #x = get_tmp(os.path.splitext(dec_target)[0])
+
+                print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
+                x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
+
+                dec(x, key, dec_target, out_filename=None)  # x 없어야함
+        elif (menu == 3):
+            break
+        else:
+            continue
+
+    #해당 파일들은 확인 끝남
+    #text(key, 'target.txt')
+    #text(key, '컴보.docx')
     #image(key, 'family.jpg')
-    #image(key, 'tkintertest.exe')
+    #image(key, '짱구얌.png')
 
 main()
