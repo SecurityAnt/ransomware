@@ -127,9 +127,10 @@ def main():
     key = b'Sixteen byte key'
 
     print("")
-    text(key, '컴보.docx')
+    #text(key, '컴보.docx')
 
     print("")
     #image(key, 'family.jpg')
+    image(key, '짱구얌.png')
 
 main()
