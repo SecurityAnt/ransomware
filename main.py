@@ -10,14 +10,11 @@ def get_tmp(in_filename):
         tmp = infile.read()
     return tmp
 
-def enc(key, in_filename, out_filename=None):
+def enc_jw(key, rsa_key,cipher,in_filename, out_filename=None):
 
     #RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
-    random_generator = Random.new().read
-    rsa_key = RSA.generate(1024, random_generator)
-    cipher = PKCS1_OAEP.new(rsa_key)
-    ciphertext = cipher.encrypt(key)
-
+    ciphertext = cipher.encrypt(key) #128비트
+    print(cipher.decrypt(ciphertext))
     print("\nRSA를 통한 key 암호화문 : \n",ciphertext,"\n")
     #/////////////////////////////////////////////////
 
@@ -38,7 +35,8 @@ def enc(key, in_filename, out_filename=None):
         data = infile.read()
 
         print("1. Plain Message was: ")
-        print(data)
+        print(data, '\n',len(data))
+        sizeOfData = len(str(len(data)))
 
         # 패딩에 대한 부분
         length = 16 - (len(data) % 16)
@@ -48,12 +46,16 @@ def enc(key, in_filename, out_filename=None):
         print(data)
 
         with open(out_filename, 'wb') as outfile:
+            pass
+        with open(out_filename,'ab') as outfile:
+            outfile.write(b'0'*(64832-sizeOfData)+bytes(sizeOfData))
+            outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
             e_data = encryptor.encrypt(data)
             # 그럼 e_data도 마찬가지로 b''형식이다.
 
             print("3. e_data Message was: ")
-            print(e_data)
+            print(bytes(sizeOfData)+b'0'*(64824-sizeOfData),ciphertext,e_data)
 
             outfile.write(e_data)
 
@@ -65,7 +67,7 @@ def enc(key, in_filename, out_filename=None):
     print("---END ENCRYPTION : AES")
 
 
-def dec(x, key, in_filename, out_filename):
+def dec_jw(x, key, rsa_key,cipher,in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -73,12 +75,19 @@ def dec(x, key, in_filename, out_filename):
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
+        sizeOfData = e_data[:64825]
+        aes_key_enc = e_data[64832:64960] #암호화된 aes 키
+        print(aes_key_enc)
 
+        aes_key_dec = cipher.decrypt(aes_key_enc)
+        print('AES key was :',aes_key_dec)
         print("1. Cipher was: ")
         print(e_data)
 
+
         with open(out_filename, 'wb') as outfile:
             decryptor = AES.new(key, mode, iv)
+
             d_data = decryptor.decrypt(e_data)
 
             print("2. before unpadding d_data")
@@ -107,30 +116,17 @@ def dec(x, key, in_filename, out_filename):
 
     print("---END DECRYPTION : AES")
 
-def text(key, in_filename):
+def test_jw(key, rsa_key,cipher,in_filename):
+    key = b'Sixteen byte key'
+
+    random_generator = Random.new().read
+
+    rsa_key = RSA.generate(1024, random_generator)  # 키 정보 객체
+    cipher = PKCS1_OAEP.new(rsa_key)
 
     print("TEXT FILE AES TEST")
     x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='target_enc.antdd')
+    enc_jw(key, rsa_key,cipher,in_filename, out_filename='target_enc.antdd')
     print("")
-    dec(x, key, 'target_enc.antdd', out_filename='컴보_dec.docx')
+    dec_jw(x, key, rsa_key,cipher,'target_enc.antdd', out_filename='target_test.txt')
 
-def image(key, in_filename):
-
-    print("IMAGE FILE AES TEST")
-    x = get_tmp(in_filename)
-    enc(key, in_filename, out_filename='family_enc.antdd')
-    print("")
-    dec(x, key, 'family_enc.antdd', out_filename='family_dec.jpg')
-
-def main():
-    key = b'Sixteen byte key'
-
-    print("")
-    #text(key, '컴보.docx')
-
-    print("")
-    #image(key, 'family.jpg')
-    image(key, '짱구얌.png')
-
-main()
