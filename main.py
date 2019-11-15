@@ -119,7 +119,7 @@ def dec(x, key, in_filename, out_filename):
 
 
 
-def enc_jw(key, rsa_key, cipher, in_filename, out_filename=None):
+def enc_jw(key, cipher, in_filename, out_filename=None):
     # RSA(최신버전인 PKCS1_OAEP)를 이용한 AES키를 public key 로 암호화
     ciphertext = cipher.encrypt(key)  # 128비트
     print(cipher.decrypt(ciphertext))
@@ -254,7 +254,7 @@ def test_jw(key, rsa_key, cipher, in_filename):
 ##print("")
 ##dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
 
-def main():
+if __name__ == "__main__":
     key = b'Sixteen byte key' #키 랜덤으로 생성해야한다.
     while True:
         menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
@@ -286,5 +286,3 @@ def main():
     #text(key, '컴보.docx')
     #image(key, 'family.jpg')
     #image(key, '짱구얌.png')
-
-main()
