@@ -118,6 +118,7 @@ if __name__ == "__main__":
         # Add the path to a GIF to make the example working
         l = AnimatedGIF(window, "thanos1.gif")
         l.pack()
+        label5.destroy()
         #window.destroy()
 
 
