@@ -50,7 +50,8 @@ class AnimatedGIF(Label, object):
         super(AnimatedGIF, self).__init__(master, image=self._frames[0])
 
     def start_animation(self, frame=None):
-        if self._is_running: return
+        if self._is_running:
+            return
 
         if frame is not None:
             self._loc = 0
@@ -60,7 +61,8 @@ class AnimatedGIF(Label, object):
         self._is_running = True
 
     def stop_animation(self):
-        if not self._is_running: return
+        if not self._is_running:
+            return
 
         if self._callback_id is not None:
             self.after_cancel(self._callback_id)
@@ -85,13 +87,11 @@ class AnimatedGIF(Label, object):
     def pack(self, start_animation=True, **kwargs):
         if start_animation:
             self.start_animation()
-
         super(AnimatedGIF, self).pack(**kwargs)
 
     def grid(self, start_animation=True, **kwargs):
         if start_animation:
             self.start_animation()
-
         super(AnimatedGIF, self).grid(**kwargs)
 
     def place(self, start_animation=True, **kwargs):
@@ -102,17 +102,14 @@ class AnimatedGIF(Label, object):
 
     def pack_forget(self, **kwargs):
         self.stop_animation()
-
         super(AnimatedGIF, self).pack_forget(**kwargs)
 
     def grid_forget(self, **kwargs):
         self.stop_animation()
-
         super(AnimatedGIF, self).grid_forget(**kwargs)
 
     def place_forget(self, **kwargs):
         self.stop_animation()
-
         super(AnimatedGIF, self).place_forget(**kwargs)
 
 
