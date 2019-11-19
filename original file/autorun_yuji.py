@@ -3,7 +3,7 @@ import shutil
 
 def list_files(path, ext=None):
     filelist=[]
-    print("os.listdir(): \n", os.listdir())
+    print("os.listdir(): ", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path,name)):
             if name.endswith('.py'):
@@ -13,7 +13,7 @@ def list_files(path, ext=None):
             elif name.endswith(ext):
                 filelist.append(name)
 
-    print("filelist: \n", filelist)
+    print("filelist: ", filelist)
     return filelist
 
 file = "tkintertest.exe"
@@ -26,5 +26,5 @@ list_files(src)
 
 print(src_file)
 print(dst_file)
-shutil.copyfile(src, dst)
+shutil.copyfile(src_file, dst_file)
 
