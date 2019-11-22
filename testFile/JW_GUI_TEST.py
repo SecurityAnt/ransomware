@@ -175,12 +175,15 @@ def remove_files(gui, remove_filelist, ext=None):
     elif (len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
+        gui.window.destroy()
     # 맨 처음 파일이 0개일 경우
     else:
         print("더 이상 삭제할 파일이 없습니다")
+        gui.window.destroy()
 
     # gui
     sleep(2)
+
     gui.l_thanos.destroy()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
     gui.l_thanos.pack()
@@ -343,9 +346,11 @@ if __name__ == "__main__":
 
     # 타이머 시작 코드
     th1 = threading.Thread(target=startTimer, args=[gui,os.getcwd()])
+    th1.daemon = True
     th1.start()
 
     # gui 시작 코드
-    th2 = threading.Thread(gui.window.mainloop())
-    th2.start()
+    # th2 = threading.Thread(gui.window.mainloop())
+    # th2.start()
+    gui.window.mainloop()
 
