@@ -173,7 +173,7 @@ def clock(gui, c, antdd_filelist):
 
 # 모두 삭제되었을 때 GUI #혜연 11/22 추가
 def allRemovePrint(gui):
-    gui.l_thanos.destroy()
+    gui.l_thanos.pack_forget()
     l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
                                fg="red", bg="black", font='Helvetica 16 bold')
     l_allremove.pack()
@@ -231,7 +231,7 @@ def remove_files(gui, remove_filelist):  # ext 안쓰더라 지워버림
     # gui
     sleep(2)
 
-    gui.l_thanos.destroy()
+    gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
     gui.l_thanos.pack()
 
