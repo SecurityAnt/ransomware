@@ -355,7 +355,7 @@ class RealMain:
 if __name__ == "__main__":
 
     # 테스트용 파일 생성하기...(복붙너무귀찮아서...)
-    for i in range(1):
+    for i in range(3):
         with open("test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
 
