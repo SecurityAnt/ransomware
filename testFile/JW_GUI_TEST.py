@@ -56,7 +56,7 @@ class tk:
 
         self.thanos = tkinter.PhotoImage(file="../ui/face.png")
 
-        self.l_thanos = tkinter.Label(self.window, image=self.thanos)
+        self.l_thanos = tkinter.Label(self.window, image=self.thanos,borderwidth=0,compound="center",highlightthickness = 0)
         self.l_thanos.pack()
 
     def key_submit(self):
@@ -75,7 +75,7 @@ class tk:
         # 다시 타노스얼굴 사진
         sleep(2)
         self.l_thanos.destroy()
-        self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos)
+        self.l_thanos = tkinter.Label(gui.self.frame2, image=gui.thanos,borderwidth=0,compound="center",highlightthickness = 0)
         self.l_thanos.pack()
 
 
@@ -194,7 +194,7 @@ def remove_files(gui, remove_filelist, ext=None):
         allRemovePrint(gui)
 
     gui.l_thanos.pack_forget()
-    gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos)
+    gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos,borderwidth=0,compound="center",highlightthickness = 0)
     gui.l_thanos.pack()
 
     # 창 띄운 거 닫음
