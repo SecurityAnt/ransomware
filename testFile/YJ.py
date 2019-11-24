@@ -163,7 +163,7 @@ def clock(gui, c, antdd_filelist):
     if c == -2:
         # 파일 삭제를 시작함
         remove_files(gui, antdd_filelist)
-        return;
+        return
 
     # gui의 타이머 label 을 갱신!
     gui.l_timer.config(text=str(c + 1))
