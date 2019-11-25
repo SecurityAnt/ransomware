@@ -28,8 +28,8 @@ iv = os.urandom(16)
 '''
 1125 수정사항 : <메일 전송/수신 시퀀스 추가>
 
-(1)테스트 방법:
-gui 창이 뜨고 나서 secureantdd@gmail.com / antdd1234 로 로그인 한 후
+(1)테스트 방법 :
+gui 창이 뜨고 나서 구글에 secureantdd@gmail.com / antdd1234 로 로그인 한 후
 자신의 mac 주소로 가장 최근에 온 메일의 private key를 input에 입력하면 => 복호화 성공
 
 (2)메일 전송 : run() 시작 부분
