@@ -119,7 +119,7 @@ class MyTk:
         self.l_text.config(text="\n고맙습니다 고갱님^^ 복호화 완료되었습니당~!\n\n", font='Helvetica 16 bold')
 
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
-        self.l_final = tkinter.Label(self.window, image=self.final_image)
+        self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
 
         #self.window.mainloop()
