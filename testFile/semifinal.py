@@ -316,20 +316,25 @@ def startTimer(gui, path, ext=None):
 
     clock(gui, 10, antdd_filelist)
 
-def clock(gui, c, antdd_filelist):
-    c -= 1
+def clock(gui, sec, antdd_filelist):
+    sec -= 1
 
     # 0초가 되면!
-    if c == -2:
+    if sec == -2:
         # 파일 삭제를 시작함
         removeFiles(gui, antdd_filelist)
         return
 
+    # 분초로 타이머 나타내기
+    gui_min = (sec + 1) // 60
+    gui_sec = (sec + 1) % 60
+    min_sec = str(gui_min) + " : " + str(gui_sec)
+
     # gui의 타이머 label 을 갱신!
-    gui.l_timer.config(text=str(c + 1))
+    gui.l_timer.config(text=min_sec)
 
     # 자기 자신 호출
-    threading.Timer(1, clock, [gui, c, antdd_filelist]).start()
+    threading.Timer(1, clock, [gui, sec, antdd_filelist]).start()
 
 class RealMain:
 
