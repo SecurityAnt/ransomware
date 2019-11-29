@@ -26,7 +26,7 @@ with open("./newgif.gif",'wb') as gif_file:
 
 # //////////////////////////////////////////////////////////////////////////////gui에 출력하기
 import tkinter
-from testFile import thanos
+from testFile import semifinal
 
 
 tk = tkinter.Tk()
@@ -39,7 +39,7 @@ tk = tkinter.Tk()
 #l.pack()
 
 # gif 테스트
-l_thanos = thanos.AnimatedGIF(tk, "newgif.gif")
+l_thanos = semifinal.thanos.AnimatedGIF(tk, "newgif.gif")
 
 
 tk.mainloop()
