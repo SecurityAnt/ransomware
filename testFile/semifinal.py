@@ -405,6 +405,7 @@ class RealMain:
         th1.daemon = True
         th1.start()
 
+        self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
         self.myGui.window.mainloop()
 
     def checkPassword(self, gui_input=None):
