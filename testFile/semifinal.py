@@ -462,11 +462,10 @@ class RealMain:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
                     self.myGui.finalGui()
-                    self.myGui.window.destroy()
 
 
 if __name__ == "__main__":
-    for i in range(5):
+    for i in range(10):
         with open("test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
     r = RealMain()
