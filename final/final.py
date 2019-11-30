@@ -68,7 +68,7 @@ def dec(cipher, in_filename, out_filename=None):
         size_of_data = e_data[:11].lstrip(b'0').decode()
         #크기가 0 바이트일 때
         if(size_of_data == ''):
-            size_of_data = '0'
+            return
         size_of_data = int(size_of_data)
         aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
 
@@ -426,11 +426,6 @@ class RealMain:
         # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
-            # text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
-            #idx = text.find('Subject:')
-            #text = text[idx + 9:]
-            # uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
-            # key = text[42:]  # 메일에 들어있는 해당 주소의 private key
             uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
             key = b'\n'.join(msg[15:]).decode()
 
