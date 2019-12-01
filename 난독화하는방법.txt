@@ -12,9 +12,9 @@ source = open(sourcefile).read()   => source = open(sourcefile,encoding='utf8').
 
 (3) 난독화 실행
 
-pyminifier --obfuscate --nonlatin --outfile=C:\Users\uns\PycharmProjects\ransomware\testFile\obfuscatingresult.txt C:\Users\uns\PycharmProjects\ransomware\testFile\JW_GUI_TEST.py
+pyminifier --obfuscate --nonlatin --outfile=C:\Users\uns\PycharmProjects\ransomware\testFile\obfuscatingresult.py C:\Users\uns\PycharmProjects\ransomware\final\final.py
 
 (4) 확인
-ransomware 프로젝트의 tesFile 폴더에 obfuscatingresult.txt 로 확인!
+ransomware 프로젝트의 tesFile 폴더에 obfuscatingresult.py 로 확인!
 
 끝
