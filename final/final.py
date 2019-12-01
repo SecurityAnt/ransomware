@@ -453,5 +453,12 @@ class RealMain:
 
 
 if __name__ == "__main__":
+    for i in range(2):
+        with open("test" + str(i) + '.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
+    os.makedirs(os.path.join(os.getcwd(),'test'))
+    for i in range(2):
+        with open("test/test" + str(i) + '.txt', 'wb') as testfile:
+            testfile.write('테스트입니다'.encode())
     r = RealMain()
     r.run()
