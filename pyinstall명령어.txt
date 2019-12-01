@@ -4,4 +4,4 @@ cd Desktop
 
 cd 파이썬디컴파일
 
-python pyinstxtractor.py integrate_exe.exe
+python pyinstxtractor.py integrate_exe_fast.exe

