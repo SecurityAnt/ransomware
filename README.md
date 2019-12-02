@@ -14,7 +14,7 @@ Don't abuse it.
 박유지- [YujiPark]
 
 김혜연- [hyeyeon0210]
-
+ginahy0210@gmail.com
 
 이미미- [@alal3960]
 alal39603819@gmail.com  
