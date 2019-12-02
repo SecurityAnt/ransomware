@@ -1,7 +1,3 @@
-"Thanos ransomware" project is copyrighted by SecurityAnt.
-This project is incomplete.
-We are not responsible for any problems caused by running this program.
-Don't abuse it.
 # Python Ransomware Project
 
 2019.2학기 경기대학교 컴퓨터보안 프로젝트
