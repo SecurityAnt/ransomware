@@ -19,5 +19,5 @@ ginahy0210@gmail.com
 이미미- [@alal3960]
 alal39603819@gmail.com  
 
-박지우 - [@a0107476]
+박지우 - [@eraserrr]
 a01074761054@gmail.com
