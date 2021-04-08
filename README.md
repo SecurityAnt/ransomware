@@ -1,6 +1,7 @@
 # Python Thanos Ransomware Project
 
 2019.2학기 경기대학교 컴퓨터보안 프로젝트
+
 ## preview
 1. 메인화면
 <img src="https://user-images.githubusercontent.com/48823900/114044833-8527fd80-98c2-11eb-80f6-74ddfcd97f76.png" width=500 height=300>
@@ -12,6 +13,7 @@
 <img src="https://user-images.githubusercontent.com/48823900/114045019-aab50700-98c2-11eb-9280-6b24e82ce76d.png" width=500 height=300>
 5. 복호화키가 입력된 후
 <img src="https://user-images.githubusercontent.com/48823900/114046189-9a515c00-98c3-11eb-911b-76e59c60baf5.png" width=500 height=300>
+
 ## Contribute
 
 박유지- [YujiPark]
