@@ -10,6 +10,8 @@
 <img src="https://user-images.githubusercontent.com/48823900/114045008-a852ad00-98c2-11eb-9ade-2b8e30134f2e.png" width=500 height=300>
 4. 파일이 모두 삭제되었을때
 <img src="https://user-images.githubusercontent.com/48823900/114045019-aab50700-98c2-11eb-9280-6b24e82ce76d.png" width=500 height=300>
+5. 복호화키가 입력된 후
+<img src="https://user-images.githubusercontent.com/48823900/114046189-9a515c00-98c3-11eb-911b-76e59c60baf5.png" width=500 height=300>
 ## Contribute
 
 박유지- [YujiPark]
