@@ -1,7 +1,15 @@
 # Python Thanos Ransomware Project
 
 2019.2학기 경기대학교 컴퓨터보안 프로젝트
-
+## preview
+1. 메인화면
+<img src="https://user-images.githubusercontent.com/48823900/114044833-8527fd80-98c2-11eb-80f6-74ddfcd97f76.png" width=500 height=300>
+2. 최초에 암호화된 파일
+<img src="https://user-images.githubusercontent.com/48823900/114044986-a4bf2600-98c2-11eb-809a-34a5824ccbcd.png" width=500 height=300>
+3. 카운팅이 다 된 후 파일의 절반이 사라짐
+<img src="https://user-images.githubusercontent.com/48823900/114045008-a852ad00-98c2-11eb-9ade-2b8e30134f2e.png" width=500 height=300>
+4. 파일이 모두 삭제되었을때
+<img src="https://user-images.githubusercontent.com/48823900/114045019-aab50700-98c2-11eb-9280-6b24e82ce76d.png" width=500 height=300>
 ## Contribute
 
 박유지- [YujiPark]
