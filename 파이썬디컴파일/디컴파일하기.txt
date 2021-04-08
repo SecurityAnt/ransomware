@@ -1,3 +1,0 @@
-1. 디컴파일할 exe파일과 다운받은 pyinstxtractor.py 한 폴더에 넣기(A폴더)
-2. cmd 창에 A폴더 경로로 들어가 python pyinstxtractor.py [디컴파일할exe파일]
-3. A폴더에서 새로 생성된 디컴파일링 결과 폴더에서 결과 확인

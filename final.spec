@@ -2,8 +2,8 @@
 
 block_cipher = None
 
-a = Analysis(['C:\\Users\\uns\\PycharmProjects\\ransomware\\final\\final.py'],
-             pathex=['C:\\Users\\uns\\PycharmProjects\\ransomware\\final'],
+a = Analysis(['C:\\Users\\user\\PycharmProjects\\ransomware\\final.py'],
+             pathex=['C:\\Users\\user\\PycharmProjects\\ransomware\\final'],
 	 binaries=[],
              datas=[('ui/*.png','ui'),('ui/*.gif','ui')],
              hiddenimports=[],

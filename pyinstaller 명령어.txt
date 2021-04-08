@@ -1,7 +1,0 @@
-pyinstaller -F --uac-admin --key=ANTDD C:\Users\uns\PycharmProjects\ransomware\final.spec
-
-cd Desktop
-
-cd 파이썬디컴파일
-
-python pyinstxtractor.py integrate_exe_fast.exe
