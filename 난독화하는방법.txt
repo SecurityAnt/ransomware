@@ -8,7 +8,7 @@ pip install pyminifier
 
 source = open(sourcefile).read()   => source = open(sourcefile,encoding='utf8').read()
 
-일반적인 파이썬폴더 경로 = C:\Users\사용자\AppData\Local\Programs\Python\Python37-32\Lib\site-packages\pyminifier
+※ 일반적인 파이썬폴더 경로 = C:\Users\사용자\AppData\Local\Programs\Python\Python37-32\Lib\site-packages\pyminifier
 
 (3) 난독화 실행
 

