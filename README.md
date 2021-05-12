@@ -2,6 +2,12 @@
 
 2019.2학기 경기대학교 컴퓨터보안 프로젝트
 
+## function
+
+- AES 파일 암호화 & 복호화 (암호화된 파일 확장자 .antdd)
+- 암호화 키는 smtp 메일서버로 전송
+- 실행파일은 코드 난독화와 함께 진행
+
 ## preview
 1. 메인화면<br>
 <img src="https://user-images.githubusercontent.com/48823900/114044833-8527fd80-98c2-11eb-80f6-74ddfcd97f76.png" width=500 height=300>
